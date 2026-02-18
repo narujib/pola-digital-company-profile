@@ -17,6 +17,7 @@ import {
   FieldLabel,
 } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
+import { Loader2 } from "lucide-react";
 import { useAuth, ApiError } from "@/context/AuthContext";
 
 export function LoginForm({
@@ -89,6 +90,7 @@ export function LoginForm({
               </Field>
               <Field>
                 <Button type="submit" disabled={loading} className="w-full">
+                  {loading && <Loader2 className="size-4 animate-spin" />}
                   {loading ? "Loading..." : "Login"}
                 </Button>
               </Field>

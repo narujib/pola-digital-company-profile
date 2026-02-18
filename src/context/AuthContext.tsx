@@ -4,6 +4,7 @@ import {
   createContext,
   useContext,
   useState,
+  useEffect,
   useCallback,
   type ReactNode,
 } from "react";
@@ -41,13 +42,23 @@ const AuthContext = createContext<AuthContextValue | null>(null);
 // ==========================================
 
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const [isAuthenticated, setIsAuthenticated] = useState(() => {
-    return !!getToken();
-  });
-  const [user, setUserState] = useState<StoredUser | null>(() => {
-    return getUser();
-  });
-  const [loading, setLoading] = useState(false);
+  // Start with server-safe defaults to avoid hydration mismatch
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [user, setUserState] = useState<StoredUser | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  // Hydrate from localStorage after mount (client-only)
+  useEffect(() => {
+    const token = getToken();
+    const storedUser = getUser();
+
+    if (token && storedUser) {
+      setIsAuthenticated(true);
+      setUserState(storedUser);
+    }
+
+    setLoading(false);
+  }, []);
 
   // Login → call API → save token → set state
   const login = useCallback(async (email: string, password: string) => {
