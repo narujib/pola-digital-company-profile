@@ -1,5 +1,6 @@
 import { NextRequest } from "next/server";
 import { successResponse, errorResponse } from "@/utils/response";
+import { withErrorHandler } from "@/utils/error-handler";
 import { createContactSchema } from "./contact.validation";
 import * as contactService from "./contact.service";
 
@@ -7,8 +8,8 @@ import * as contactService from "./contact.service";
 // Submit Contact Message (Public)
 // ==========================================
 
-export async function submitContactController(req: NextRequest) {
-  try {
+export const submitContactController = withErrorHandler(
+  async (req: NextRequest) => {
     const body = await req.json();
     const result = createContactSchema.safeParse(body);
 
@@ -23,31 +24,15 @@ export async function submitContactController(req: NextRequest) {
     const message = await contactService.submitMessage(result.data);
 
     return successResponse({ data: message, status: 201 });
-  } catch (error) {
-    console.error("Submit contact error:", error);
-    return errorResponse({
-      code: "INTERNAL_ERROR",
-      message: "Terjadi kesalahan internal",
-      status: 500,
-    });
   }
-}
+);
 
 // ==========================================
 // Get All Messages (Admin)
 // ==========================================
 
-export async function getAllMessagesController() {
-  try {
-    const messages = await contactService.getAllMessages();
+export const getAllMessagesController = withErrorHandler(async () => {
+  const messages = await contactService.getAllMessages();
 
-    return successResponse({ data: messages });
-  } catch (error) {
-    console.error("Get messages error:", error);
-    return errorResponse({
-      code: "INTERNAL_ERROR",
-      message: "Terjadi kesalahan internal",
-      status: 500,
-    });
-  }
-}
+  return successResponse({ data: messages });
+});
