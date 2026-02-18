@@ -1,16 +1,17 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { fetchBlogs } from "@/features/blog/blog.api";
+import { useState, useEffect, useCallback } from "react";
+import { fetchBlogs, deleteBlog } from "@/features/blog/blog.api";
 
 interface UseBlogsParams {
   page?: number;
   limit?: number;
   search?: string;
   published?: boolean;
+  include?: string;
 }
 
-interface Blog {
+export interface Blog {
   id: string;
   title: string;
   slug: string;
@@ -63,3 +64,35 @@ export function useBlogs(params?: UseBlogsParams): UseBlogsResult {
 
   return { blogs, total, totalPages, loading, error, refetch: load };
 }
+
+// ==========================================
+// useDeleteBlog
+// ==========================================
+
+interface UseDeleteBlogResult {
+  deleteBlogById: (id: string) => Promise<void>;
+  loading: boolean;
+  error: string | null;
+}
+
+export function useDeleteBlog(): UseDeleteBlogResult {
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const deleteBlogById = useCallback(async (id: string) => {
+    setLoading(true);
+    setError(null);
+    try {
+      await deleteBlog(id);
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : "Gagal menghapus blog";
+      setError(msg);
+      throw err;
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  return { deleteBlogById, loading, error };
+}
+
