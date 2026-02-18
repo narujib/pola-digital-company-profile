@@ -1,0 +1,13 @@
+import { z } from "zod/v4";
+
+export const loginSchema = z.object({
+  email: z
+    .string()
+    .email("Format email tidak valid")
+    .max(150, "Email maksimal 150 karakter"),
+  password: z
+    .string()
+    .min(1, "Password wajib diisi"),
+});
+
+export type LoginInput = z.infer<typeof loginSchema>;
