@@ -17,15 +17,14 @@ import {
   FieldLabel,
 } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
-import { loginRequest } from "@/features/auth/auth.api";
-import { setToken, setUser } from "@/lib/auth-storage";
-import { ApiError } from "@/lib/http";
+import { useAuth, ApiError } from "@/context/AuthContext";
 
 export function LoginForm({
   className,
   ...props
 }: React.ComponentProps<"div">) {
   const router = useRouter();
+  const { login } = useAuth();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
@@ -37,13 +36,7 @@ export function LoginForm({
     setLoading(true);
 
     try {
-      const result = await loginRequest({ email, password });
-
-      // Simpan token & user via auth-storage
-      setToken(result.data.token);
-      setUser(result.data.user);
-
-      // Redirect ke dashboard
+      await login(email, password);
       router.push("/admin/dashboard");
     } catch (err) {
       if (err instanceof ApiError) {

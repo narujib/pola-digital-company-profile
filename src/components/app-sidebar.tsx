@@ -23,7 +23,7 @@ import {
   SidebarFooter,
   SidebarRail,
 } from "@/components/ui/sidebar";
-import { clearAuth } from "@/lib/auth-storage";
+import { useAuth } from "@/context/AuthContext";
 
 const navItems = [
   {
@@ -45,11 +45,7 @@ const navItems = [
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const pathname = usePathname();
-
-  function handleLogout() {
-    clearAuth();
-    window.location.href = "/admin/login";
-  }
+  const { logout } = useAuth();
 
   return (
     <Sidebar {...props}>
@@ -80,7 +76,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       <SidebarFooter className="border-t">
         <SidebarMenu>
           <SidebarMenuItem>
-            <SidebarMenuButton onClick={handleLogout}>
+            <SidebarMenuButton onClick={logout}>
               <LogOut className="size-4" />
               <span>Logout</span>
             </SidebarMenuButton>
