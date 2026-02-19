@@ -1,4 +1,10 @@
+import type { Metadata } from "next";
 import Link from "next/link";
+
+export const metadata: Metadata = {
+  title: "Tentang Kami - Pola Digital",
+  description: "Pelajari lebih lanjut tentang Pola Digital, visi kami, dan tim profesional yang siap membantu transformasi digital bisnis Anda.",
+};
 
 export default function AboutPage() {
   return (

@@ -1,4 +1,10 @@
+import type { Metadata } from "next";
 import Link from "next/link";
+
+export const metadata: Metadata = {
+  title: "Layanan Kami - Pola Digital",
+  description: "Jelajahi layanan unggulan kami: Pengembangan Web, Mobile App, Sistem Informasi, dan Konsultasi IT.",
+};
 
 export default function ServicesPage() {
   return (

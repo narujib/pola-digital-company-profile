@@ -1,4 +1,10 @@
 import Link from "next/link";
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Pola Digital - Mitra Transformasi Digital Terpercaya",
+  description: "Pola Digital membantu bisnis Anda berkembang dengan solusi teknologi inovatif, pengembangan software, dan strategi digital yang efektif.",
+};
 
 export default function HomePage() {
   return (

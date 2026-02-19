@@ -1,4 +1,10 @@
+import type { Metadata } from "next";
 import Link from "next/link";
+
+export const metadata: Metadata = {
+  title: "Blog & Artikel - Pola Digital",
+  description: "Dapatkan wawasan terbaru seputar teknologi, bisnis, dan transformasi digital di blog Pola Digital.",
+};
 
 export default function BlogPage() {
   return (

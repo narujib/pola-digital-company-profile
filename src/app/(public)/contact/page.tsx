@@ -1,4 +1,10 @@
+import type { Metadata } from "next";
 import Link from "next/link";
+
+export const metadata: Metadata = {
+  title: "Hubungi Kami - Pola Digital",
+  description: "Hubungi Pola Digital untuk konsultasi gratis mengenai kebutuhan teknologi dan pengembangan sistem Anda.",
+};
 
 export default function ContactPage() {
   return (

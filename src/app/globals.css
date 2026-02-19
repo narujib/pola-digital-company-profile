@@ -124,3 +124,115 @@
     @apply bg-background text-foreground;
   }
 }
+
+/* ============================================================
+   PUBLIC PAGE STYLES — DO NOT MODIFY ABOVE THIS LINE
+   ============================================================ */
+
+:root {
+  /* Public page colors */
+  --pub-dark: #063231; /* --ht-heading-color */
+  --pub-body: #063231; /* --ht-text-color (same as heading in template) */
+  --pub-accent: #f75709; /* --ht-theme-color-2 (Orange) */
+  --pub-accent-green: #c3df94; /* --ht-theme-color-3 */
+  --pub-light-bg: #f5f7f7; /* --ht-theme-color-5 */
+  --pub-footer-bg: #063231; /* --ht-theme-color (Main brand color) */
+  --pub-border: #d7dede; /* --ht-border-color */
+
+  /* Font families */
+  --font-heading: var(--font-oswald), sans-serif;
+  --font-body: var(--font-jakarta), sans-serif;
+}
+
+/* Public page section spacing */
+.section-padding {
+  @apply py-20 lg:py-28;
+}
+
+/* Public page container */
+.pub-container {
+  @apply mx-auto max-w-[1320px] px-4;
+}
+
+/* Public subtitle tag */
+.pub-subtitle {
+  @apply inline-block text-sm font-semibold uppercase tracking-[2px] text-[var(--pub-accent)] mb-4;
+  font-family: var(--font-heading);
+}
+
+/* Public section title */
+.pub-title {
+  @apply text-3xl lg:text-5xl font-bold leading-tight text-[var(--pub-dark)] uppercase;
+  font-family: var(--font-heading);
+}
+
+/* Public body text */
+.pub-text {
+  @apply text-lg leading-[30px];
+  color: var(--pub-body);
+  font-family: var(--font-body);
+}
+
+/* Primary CTA button */
+.pub-btn {
+  @apply inline-flex items-center justify-center px-8 py-4 text-sm font-semibold uppercase rounded-lg tracking-wider text-white transition-all duration-300;
+  background: var(--pub-dark);
+  font-family: var(--font-heading);
+}
+.pub-btn:hover {
+  background: var(--pub-accent);
+}
+
+.pub-btn-outline {
+  @apply inline-flex items-center justify-center px-8 py-4 text-sm font-semibold uppercase rounded-lg tracking-wider border-2 transition-all duration-300;
+  color: var(--pub-dark);
+  border-color: var(--pub-dark);
+  font-family: var(--font-heading);
+}
+.pub-btn-outline:hover {
+  background: var(--pub-dark);
+  color: white;
+}
+
+/* Fade-in animation */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-in-up {
+  animation: fadeInUp 0.6s ease-out forwards;
+}
+
+/* Float bob animation */
+@keyframes floatBobY {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-15px);
+  }
+}
+@keyframes floatBobX {
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+  50% {
+    transform: translateX(-15px);
+  }
+}
+
+.float-bob-y {
+  animation: floatBobY 3s ease-in-out infinite;
+}
+.float-bob-x {
+  animation: floatBobX 3s ease-in-out infinite;
+}
