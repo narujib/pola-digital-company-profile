@@ -22,12 +22,12 @@ export class BlogError extends Error {
 // ==========================================
 
 export async function createBlog(input: CreateBlogInput, authorId: string) {
-  const slug = generateSlug(input.title);
+  const slug = input.slug?.trim() || generateSlug(input.title);
 
   // Cek slug sudah ada atau belum
   const existing = await blogRepo.findBySlug(slug);
   if (existing) {
-    throw new BlogError("SLUG_EXISTS", "Blog dengan judul serupa sudah ada");
+    throw new BlogError("SLUG_EXISTS", "Blog dengan slug serupa sudah ada");
   }
 
   return blogRepo.createBlog({
@@ -52,17 +52,22 @@ export async function updateBlog(id: string, input: UpdateBlogInput) {
     throw new BlogError("NOT_FOUND", "Blog tidak ditemukan");
   }
 
-  // Jika title berubah, generate slug baru
+  // Jika slug diberikan dari client, gunakan itu; jika title berubah, generate slug baru
   const data: Prisma.BlogUpdateInput = { ...input };
-  if (input.title && input.title !== existing.title) {
-    const newSlug = generateSlug(input.title);
 
-    // Cek slug baru tidak konflik
+  if (input.slug?.trim()) {
+    const newSlug = input.slug.trim();
     const slugExists = await blogRepo.findBySlug(newSlug);
     if (slugExists && slugExists.id !== id) {
-      throw new BlogError("SLUG_EXISTS", "Blog dengan judul serupa sudah ada");
+      throw new BlogError("SLUG_EXISTS", "Blog dengan slug serupa sudah ada");
     }
-
+    data.slug = newSlug;
+  } else if (input.title && input.title !== existing.title) {
+    const newSlug = generateSlug(input.title);
+    const slugExists = await blogRepo.findBySlug(newSlug);
+    if (slugExists && slugExists.id !== id) {
+      throw new BlogError("SLUG_EXISTS", "Blog dengan slug serupa sudah ada");
+    }
     data.slug = newSlug;
   }
 

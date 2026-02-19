@@ -1,9 +1,11 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import { AdminHeader } from "@/components/admin-header";
 import { useCreateBlog } from "@/features/blog/blog.hooks";
+import { useUnsavedChanges } from "@/hooks/use-unsaved-changes";
+import { generateSlug } from "@/utils/slug";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -18,7 +20,7 @@ import {
   FieldGroup,
   FieldLabel,
 } from "@/components/ui/field";
-import { Loader2 } from "lucide-react";
+import { Loader2, Link as LinkIcon } from "lucide-react";
 import { toast } from "sonner";
 
 export default function AdminCreateBlogPage() {
@@ -26,10 +28,22 @@ export default function AdminCreateBlogPage() {
   const { create, loading, error } = useCreateBlog();
 
   const [title, setTitle] = useState("");
+  const [customSlug, setCustomSlug] = useState<string | null>(null);
   const [content, setContent] = useState("");
   const [excerpt, setExcerpt] = useState("");
   const [thumbnail, setThumbnail] = useState("");
   const [isPublished, setIsPublished] = useState(false);
+  const [saved, setSaved] = useState(false);
+
+  // Slug is either manually entered or auto-derived from title
+  const slug = customSlug ?? generateSlug(title);
+
+  // Track unsaved changes
+  const hasChanges = useMemo(
+    () => !saved && (!!title || !!content || !!excerpt || !!thumbnail),
+    [saved, title, content, excerpt, thumbnail]
+  );
+  useUnsavedChanges(hasChanges);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -37,11 +51,13 @@ export default function AdminCreateBlogPage() {
     try {
       await create({
         title,
+        slug: slug || undefined,
         content,
         excerpt,
         thumbnail: thumbnail || undefined,
         isPublished,
       });
+      setSaved(true);
       toast.success("Blog berhasil dibuat");
       router.push("/admin/blogs");
     } catch {
@@ -81,6 +97,36 @@ export default function AdminCreateBlogPage() {
                     onChange={(e) => setTitle(e.target.value)}
                     required
                   />
+                </Field>
+
+                <Field>
+                  <FieldLabel htmlFor="slug">Slug</FieldLabel>
+                  <div className="relative">
+                    <LinkIcon className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
+                    <Input
+                      id="slug"
+                      placeholder="url-slug-blog"
+                      value={slug}
+                      onChange={(e) => {
+                        setCustomSlug(e.target.value);
+                      }}
+                      className="pl-9"
+                    />
+                  </div>
+                  {slug && (
+                    <p className="text-xs text-muted-foreground mt-1">
+                      Preview: <span className="font-mono text-foreground">/blog/{slug}</span>
+                    </p>
+                  )}
+                  {customSlug !== null && (
+                    <button
+                      type="button"
+                      className="text-xs text-primary hover:underline mt-0.5"
+                      onClick={() => setCustomSlug(null)}
+                    >
+                      Reset ke auto-generate
+                    </button>
+                  )}
                 </Field>
 
                 <Field>

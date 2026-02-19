@@ -102,6 +102,7 @@ export function useDeleteBlog(): UseDeleteBlogResult {
 
 export interface CreateBlogPayload {
   title: string;
+  slug?: string;
   content: string;
   excerpt: string;
   thumbnail?: string;

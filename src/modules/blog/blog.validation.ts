@@ -5,6 +5,10 @@ export const createBlogSchema = z.object({
     .string()
     .min(1, "Title wajib diisi")
     .max(200, "Title maksimal 200 karakter"),
+  slug: z
+    .string()
+    .max(255, "Slug maksimal 255 karakter")
+    .optional(),
   content: z
     .string()
     .min(1, "Content wajib diisi"),
@@ -26,6 +30,10 @@ export const updateBlogSchema = z.object({
     .string()
     .min(1, "Title wajib diisi")
     .max(200, "Title maksimal 200 karakter")
+    .optional(),
+  slug: z
+    .string()
+    .max(255, "Slug maksimal 255 karakter")
     .optional(),
   content: z
     .string()
