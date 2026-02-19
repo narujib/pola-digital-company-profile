@@ -70,6 +70,7 @@ interface FetchBlogsParams {
   search?: string;
   published?: boolean;
   include?: string;
+  sort?: string;
 }
 
 // ==========================================
@@ -118,6 +119,7 @@ export async function fetchBlogs(
   if (params?.published !== undefined)
     searchParams.set("filter[published]", String(params.published));
   if (params?.include) searchParams.set("include", params.include);
+  if (params?.sort) searchParams.set("sort", params.sort);
 
   const qs = searchParams.toString();
   const raw = await httpGet<JsonApiListResponse<BlogAttributes>>(

@@ -63,6 +63,7 @@ export const querySchema = z.object({
   search: z.string().optional(),
   published: z.enum(["true", "false"]).optional(),
   include: z.string().optional(),
+  sort: z.string().optional(),
 });
 
 export type CreateBlogInput = z.infer<typeof createBlogSchema>;
@@ -93,6 +94,8 @@ export function parseJsonApiQuery(searchParams: URLSearchParams): Record<string,
       result.limit = value;
     } else if (key === "include") {
       result.include = value;
+    } else if (key === "sort") {
+      result.sort = value;
     }
   }
 

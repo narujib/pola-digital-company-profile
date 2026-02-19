@@ -119,7 +119,7 @@ export async function getBlogBySlug(slug: string, include?: string) {
 // ==========================================
 
 export async function getAllBlogs(query: QueryInput) {
-  const { page, limit, search, published, include } = query;
+  const { page, limit, search, published, include, sort } = query;
 
   // Build where clause
   const where: Prisma.BlogWhereInput = {};
@@ -135,6 +135,17 @@ export async function getAllBlogs(query: QueryInput) {
     };
   }
 
+  // Handle sorting
+  let orderBy: Prisma.BlogOrderByWithRelationInput = { createdAt: "desc" };
+  if (sort) {
+    const isDesc = sort.startsWith("-");
+    const field = isDesc ? sort.substring(1) : sort;
+    // Validate field to prevent injection/errors (simple allowlist)
+    if (["title", "createdAt", "updatedAt", "isPublished"].includes(field)) {
+      orderBy = { [field]: isDesc ? "desc" : "asc" };
+    }
+  }
+
   const includeAuthor = include?.includes("author") ?? false;
   const skip = (page - 1) * limit;
 
@@ -145,6 +156,7 @@ export async function getAllBlogs(query: QueryInput) {
       skip,
       take: limit,
       includeAuthor,
+      orderBy,
     }),
     blogRepo.countTotal(where),
   ]);

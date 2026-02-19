@@ -9,6 +9,7 @@ interface UseBlogsParams {
   search?: string;
   published?: boolean;
   include?: string;
+  sort?: string;
 }
 
 export interface Blog {

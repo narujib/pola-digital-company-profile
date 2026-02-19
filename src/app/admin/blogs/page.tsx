@@ -21,6 +21,7 @@ import { toast } from "sonner";
 import { AdminSearchInput } from "@/components/admin/search-input";
 import { AdminStatusFilter } from "@/components/admin/status-filter";
 import { AdminPagination } from "@/components/admin/pagination";
+import { AdminSortSelect } from "@/components/admin/sort-select";
 import { BlogListTable } from "@/features/blog/components/blog-list-table";
 
 const LIMIT = 10;
@@ -42,6 +43,7 @@ export default function AdminBlogsPage() {
   const urlPage = Number(searchParams.get("page[number]")) || 1;
   const urlSearch = searchParams.get("filter[search]") || "";
   const urlStatus = searchParams.get("filter[published]");
+  const urlSort = searchParams.get("sort") || "-createdAt";
   const statusFilter = urlStatus === "true" ? "published" : urlStatus === "false" ? "draft" : "all";
 
   // Build params for useBlogs
@@ -51,8 +53,9 @@ export default function AdminBlogsPage() {
   const { blogs, totalPages, loading, error, refetch } = useBlogs({
     page: urlPage,
     limit: LIMIT,
-    search: urlSearch || undefined, // use urlSearch directly, debounce is handled in component
+    search: urlSearch || undefined,
     published,
+    sort: urlSort,
     include: "author",
   });
 
@@ -67,8 +70,9 @@ export default function AdminBlogsPage() {
       "page[number]": "1",
       "filter[search]": value || undefined,
       "filter[published]": published,
+      "sort": urlSort,
     }));
-  }, [router, statusFilter]);
+  }, [router, statusFilter, urlSort]);
 
   const handleStatusChange = useCallback((value: string) => {
     const published = value === "published" ? "true" : value === "draft" ? "false" : undefined;
@@ -76,8 +80,19 @@ export default function AdminBlogsPage() {
       "page[number]": "1",
       "filter[search]": urlSearch || undefined,
       "filter[published]": published,
+      "sort": urlSort,
     }));
-  }, [router, urlSearch]);
+  }, [router, urlSearch, urlSort]);
+
+  const handleSortChange = useCallback((value: string) => {
+    const published = statusFilter === "published" ? "true" : statusFilter === "draft" ? "false" : undefined;
+    router.replace(buildUrl({
+      "page[number]": "1",
+      "filter[search]": urlSearch || undefined,
+      "filter[published]": published,
+      "sort": value,
+    }));
+  }, [router, urlSearch, statusFilter]);
 
   const handlePageChange = useCallback((newPage: number) => {
     const published = statusFilter === "published" ? "true" : statusFilter === "draft" ? "false" : undefined;
@@ -85,8 +100,9 @@ export default function AdminBlogsPage() {
       "page[number]": String(newPage),
       "filter[search]": urlSearch || undefined,
       "filter[published]": published,
+      "sort": urlSort,
     }));
-  }, [router, urlSearch, statusFilter]);
+  }, [router, urlSearch, statusFilter, urlSort]);
 
   const handleDelete = useCallback(async () => {
     if (!deleteTarget) return;
@@ -128,10 +144,16 @@ export default function AdminBlogsPage() {
             value={urlSearch}
             onChange={handleSearchChange}
           />
-          <AdminStatusFilter
-            value={statusFilter}
-            onChange={handleStatusChange}
-          />
+          <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
+            <AdminStatusFilter
+              value={statusFilter}
+              onChange={handleStatusChange}
+            />
+            <AdminSortSelect
+              value={urlSort}
+              onChange={handleSortChange}
+            />
+          </div>
         </div>
 
         <BlogListTable
