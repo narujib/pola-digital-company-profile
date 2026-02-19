@@ -5,10 +5,15 @@ import Image from "next/image";
 import { benefits } from "@/content/home/benefits";
 import { chooseContent } from "@/content/home/choose";
 import { BenefitItem } from "@/components/ui/benefit-item";
+import { cn } from "@/lib/utils";
 
-export function ChooseSection() {
+interface ChooseSectionProps {
+  className?: string;
+}
+
+export function ChooseSection({ className }: ChooseSectionProps) {
   return (
-    <section className="py-20 lg:py-28 bg-[#063231] overflow-hidden">
+    <section className={cn("py-20 lg:py-28 bg-[#063231] overflow-hidden", className)}>
       <div className="pub-container">
         <div className="grid grid-cols-1 xl:grid-cols-12 gap-12 lg:gap-20">
           

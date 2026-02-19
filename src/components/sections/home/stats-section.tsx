@@ -1,9 +1,14 @@
 import { stats } from "@/content/home/stats";
 import { StatItem } from "@/components/ui/stat-item";
+import { cn } from "@/lib/utils";
 
-export function StatsSection() {
+interface StatsSectionProps {
+  className?: string;
+}
+
+export function StatsSection({ className }: StatsSectionProps) {
   return (
-    <section className="relative py-20 lg:py-28 bg-[#063231] overflow-hidden text-white">
+    <section className={cn("relative py-20 lg:py-28 bg-[#063231] overflow-hidden text-white", className)}>
       <div className="pub-container relative z-10">
         <div
           className="bg-white/10 rounded-3xl p-12 lg:p-16"

@@ -1,5 +1,9 @@
-import type { Metadata } from "next";
-import Link from "next/link";
+import { Metadata } from "next";
+import { BreadcrumbBanner } from "@/components/ui/breadcrumb-banner";
+import { MissionSection } from "@/components/sections/about/mission-section";
+import { StatsSection } from "@/components/sections/home/stats-section";
+import { ChooseSection } from "@/components/sections/home/choose-section";
+import { TestimonialsSection } from "@/components/sections/home/testimonials-section";
 
 export const metadata: Metadata = {
   title: "Tentang Kami - Pola Digital",
@@ -8,10 +12,19 @@ export const metadata: Metadata = {
 
 export default function AboutPage() {
   return (
-    <main className="min-h-screen flex flex-col items-center justify-center p-8">
-      <h1 className="text-4xl font-bold mb-4">About</h1>
-      <p className="text-lg text-gray-600">Halaman tentang Pola Digital.</p>
-      <Link href="/" className="mt-6 text-blue-600 hover:underline">← Kembali ke Home</Link>
+    <main>
+      <BreadcrumbBanner
+        title="Tentang Kami"
+        paths={[
+          { label: "Beranda", href: "/" },
+          { label: "Tentang Kami" }
+        ]}
+      />
+      <MissionSection />
+      {/* Reduced vertical spacing between sections with the same background */}
+      <StatsSection className="pb-10 lg:pb-14" />
+      <ChooseSection className="pt-10 lg:pt-14" />
+      <TestimonialsSection />
     </main>
   );
 }
