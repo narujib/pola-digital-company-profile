@@ -9,6 +9,7 @@ import { generateSlug } from "@/utils/slug";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import { RichTextEditor } from "@/components/rich-text-editor";
 import {
   Card,
   CardContent,
@@ -148,14 +149,11 @@ function EditBlogForm({ blog }: { blog: Blog }) {
 
             <Field>
               <FieldLabel htmlFor="content">Konten</FieldLabel>
-              <Textarea
-                id="content"
+              <RichTextEditor
+                content={content}
+                onChange={setContent}
                 placeholder="Tulis konten blog di sini..."
-                value={content}
-                onChange={(e) => setContent(e.target.value)}
-                rows={12}
-                className="font-mono text-sm"
-                required
+                className="min-h-[400px]"
               />
             </Field>
 

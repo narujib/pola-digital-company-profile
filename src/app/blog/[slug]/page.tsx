@@ -1,4 +1,7 @@
 import Link from "next/link";
+import { notFound } from "next/navigation";
+import { getBlogBySlug } from "@/modules/blog/blog.service";
+import { formatDate } from "@/lib/utils";
 
 export default async function BlogDetailPage({
   params,
@@ -7,13 +10,59 @@ export default async function BlogDetailPage({
 }) {
   const { slug } = await params;
 
+  let blog;
+  try {
+    // Assert type since dynamic include is tricky for TS inference here without generics
+    blog = await getBlogBySlug(slug, "author") as unknown as {
+      title: string;
+      content: string;
+      createdAt: Date;
+      thumbnail: string | null;
+      author: { name: string };
+    };
+  } catch {
+    notFound();
+  }
+
   return (
-    <main className="min-h-screen flex flex-col items-center justify-center p-8">
-      <h1 className="text-4xl font-bold mb-4">Blog Detail</h1>
-      <p className="text-lg text-gray-600">
-        Slug: <code className="bg-gray-100 px-2 py-1 rounded">{slug}</code>
-      </p>
-      <Link href="/blog" className="mt-6 text-blue-600 hover:underline">← Kembali ke Blog</Link>
+    <main className="min-h-screen py-12 px-4 sm:px-6 lg:px-8">
+      <article className="max-w-3xl mx-auto">
+        {/* Header */}
+        <header className="mb-8">
+          <Link
+            href="/blog"
+            className="text-sm font-medium text-muted-foreground hover:text-foreground mb-4 inline-flex items-center gap-1"
+          >
+            ← Kembali ke Blog
+          </Link>
+          <div className="flex items-center gap-2 text-sm text-muted-foreground mb-4">
+            <time dateTime={blog.createdAt.toISOString()}>
+              {formatDate(blog.createdAt)}
+            </time>
+            <span>•</span>
+            <span>{blog.author.name}</span>
+          </div>
+          <h1 className="text-3xl sm:text-4xl font-extrabold tracking-tight text-foreground mb-4">
+            {blog.title}
+          </h1>
+          {blog.thumbnail && (
+            <div className="relative aspect-video w-full overflow-hidden rounded-lg mb-8 bg-muted">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src={blog.thumbnail}
+                alt={blog.title}
+                className="object-cover w-full h-full"
+              />
+            </div>
+          )}
+        </header>
+
+        {/* Content */}
+        <div
+          className="prose prose-lg dark:prose-invert max-w-none break-words"
+          dangerouslySetInnerHTML={{ __html: blog.content }}
+        />
+      </article>
     </main>
   );
 }
