@@ -32,9 +32,9 @@ export function SiteHeader() {
       {/* Main Header */}
       <div
         className={cn(
-          "w-full transition-all duration-300",
+          "w-full transition-all duration-300 z-50",
           isScrolled
-            ? "fixed top-0 left-0 bg-white shadow-md z-fixed"
+            ? "fixed top-0 left-0 bg-white shadow-md"
             : "absolute top-0 left-0 bg-transparent"
         )}
       >
@@ -56,10 +56,9 @@ export function SiteHeader() {
                         <Link
                           href={link.href}
                           className={cn(
-                            "text-sm font-semibold uppercase tracking-wider transition-colors",
+                            "pub-nav-link",
                             isActive ? "text-[var(--pub-accent)]" : "text-[var(--pub-dark)] hover:text-[var(--pub-accent)]"
                           )}
-                          style={{ fontFamily: "var(--font-heading)" }}
                         >
                           {link.label}
                         </Link>
@@ -97,10 +96,9 @@ export function SiteHeader() {
                               href={link.href}
                               onClick={() => setMobileOpen(false)}
                               className={cn(
-                                "block text-base font-semibold uppercase tracking-wider transition-colors py-2",
+                                "pub-nav-link block py-2 text-base",
                                 isActive ? "text-[var(--pub-accent)]" : "text-[var(--pub-dark)] hover:text-[var(--pub-accent)]"
                               )}
-                              style={{ fontFamily: "var(--font-heading)" }}
                             >
                               {link.label}
                             </Link>

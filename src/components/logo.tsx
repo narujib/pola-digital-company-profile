@@ -19,9 +19,9 @@ export function Logo({ className, showText = true, size = "md" }: LogoProps) {
   const s = sizeMap[size];
 
   return (
-    <div className={cn("flex items-center gap-2 font-semibold", className)}>
+    <div className={cn("flex items-center gap-2 font-bold", className)}>
       <Hexagon className={cn(s.icon, "text-primary")} />
-      {showText && <span className={s.text}>Pola Digital</span>}
+      {showText && <span className={(s.text, "pub-h6")}>Pola Digital</span>}
     </div>
   );
 }

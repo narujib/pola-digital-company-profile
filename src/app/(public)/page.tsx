@@ -1,5 +1,10 @@
-import Link from "next/link";
 import type { Metadata } from "next";
+import { HeroSection } from "@/components/sections/home/hero-section";
+import { StatsSection } from "@/components/sections/home/stats-section";
+import { AboutSection } from "@/components/sections/home/about-section";
+import { ChooseSection } from "@/components/sections/home/choose-section";
+import { TestimonialsSection } from "@/components/sections/home/testimonials-section";
+import { BlogSection } from "@/components/sections/home/blog-section";
 
 export const metadata: Metadata = {
   title: "Pola Digital - Mitra Transformasi Digital Terpercaya",
@@ -8,15 +13,13 @@ export const metadata: Metadata = {
 
 export default function HomePage() {
   return (
-    <main className="min-h-screen flex flex-col items-center justify-center p-8">
-      <h1 className="text-4xl font-bold mb-4">Pola Digital</h1>
-      <p className="text-lg text-gray-600 mb-8">Company Profile</p>
-      <nav className="flex flex-col gap-3 text-center">
-        <Link href="/about" className="text-blue-600 hover:underline">About</Link>
-        <Link href="/services" className="text-blue-600 hover:underline">Services</Link>
-        <Link href="/blog" className="text-blue-600 hover:underline">Blog</Link>
-        <Link href="/contact" className="text-blue-600 hover:underline">Contact</Link>
-      </nav>
+    <main>
+      <HeroSection />
+      <StatsSection />
+      <AboutSection />
+      <ChooseSection />
+      <TestimonialsSection />
+      <BlogSection />
     </main>
   );
 }

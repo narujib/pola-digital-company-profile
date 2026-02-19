@@ -12,6 +12,7 @@ const jakarta = Plus_Jakarta_Sans({
 const oswald = Oswald({
   variable: "--font-oswald",
   subsets: ["latin"],
+  weight: ["400", "500", "600", "700"],
 });
 
 export const metadata: Metadata = {
@@ -19,19 +20,21 @@ export const metadata: Metadata = {
   description: "Pola Digital Company Profile",
 };
 
+import { AOSInit } from "@/components/lib/aos-init";
+
 export default function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
-      <body
-        className={`${jakarta.variable} ${oswald.variable} antialiased`}
-        style={{ fontFamily: "var(--font-jakarta), sans-serif" }}
-      >
-        <Providers>{children}</Providers>
-        <Toaster richColors position="top-right" />
+    <html lang="id">
+      <body className={`${oswald.variable} ${jakarta.variable} font-body antialiased`}>
+        <Providers>
+          <AOSInit />
+          {children}
+          <Toaster richColors position="top-right" />
+        </Providers>
       </body>
     </html>
   );
