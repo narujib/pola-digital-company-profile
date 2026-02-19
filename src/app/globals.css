@@ -209,7 +209,7 @@
 
 /* Primary CTA button */
 @utility pub-btn {
-  @apply inline-flex items-center justify-center px-8 py-4 text-sm font-semibold uppercase rounded-lg tracking-wider text-white transition-all duration-300;
+  @apply inline-flex items-center justify-center px-8 py-4 text-sm font-semibold uppercase rounded-md tracking-wider text-white transition-all duration-300;
   background: var(--pub-dark);
   font-family: var(--font-oswald), sans-serif !important;
 }
@@ -218,7 +218,7 @@
 }
 
 @utility pub-btn-accent {
-  @apply inline-flex items-center justify-center px-8 py-4 text-sm font-semibold uppercase rounded-lg tracking-wider text-white transition-all duration-300;
+  @apply inline-flex items-center justify-center px-8 py-4 text-sm font-semibold uppercase rounded-md tracking-wider text-white transition-all duration-300;
   background: var(--pub-accent);
   font-family: var(--font-oswald), sans-serif !important;
 }
@@ -228,7 +228,7 @@
 }
 
 @utility pub-btn-outline {
-  @apply inline-flex items-center justify-center px-8 py-4 text-sm font-semibold uppercase rounded-lg tracking-wider border-2 transition-all duration-300;
+  @apply inline-flex items-center justify-center px-8 py-4 text-sm font-semibold uppercase rounded-md tracking-wider border-2 transition-all duration-300;
   color: var(--pub-dark);
   border-color: var(--pub-dark);
   font-family: var(--font-oswald), sans-serif !important;

@@ -19,7 +19,7 @@ export function ServiceCard({
 }: ServiceCardProps) {
   return (
     <div
-      className="group bg-white p-8 lg:p-10 rounded-[20px] transition-all duration-300 border border-gray-100 h-full flex flex-col"
+      className="group bg-white p-8 lg:p-10 rounded-md transition-all duration-300 border border-gray-100 h-full flex flex-col"
       data-aos="fade-up"
       data-aos-delay={delayIndex * 200 + 200}
     >

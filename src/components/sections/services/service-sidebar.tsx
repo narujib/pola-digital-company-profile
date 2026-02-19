@@ -14,7 +14,7 @@ export function ServiceSidebar({ activeSlug }: ServiceSidebarProps) {
   return (
     <div className="flex flex-col gap-10">
       {/* Services List Widget */}
-      <div className="bg-[#F5F7F7] p-8 lg:p-10 rounded-[20px]">
+      <div className="bg-[#F5F7F7] p-8 lg:p-10 rounded-md">
         <h4 className="pub-h5 text-[var(--pub-dark)] mb-8">{details.sidebarTitle}</h4>
         <ul className="flex flex-col gap-4">
           {servicesData.map((service) => (
@@ -22,7 +22,7 @@ export function ServiceSidebar({ activeSlug }: ServiceSidebarProps) {
               <Link
                 href={`/services/${service.slug}`}
                 className={cn(
-                  "flex items-center justify-between p-5 rounded-xl transition-all duration-300 group",
+                  "flex items-center justify-between p-5 rounded-md transition-all duration-300 group",
                   activeSlug === service.slug
                     ? "bg-[var(--pub-accent)] text-white"
                     : "bg-white text-[var(--pub-dark)] hover:bg-[var(--pub-accent)] hover:text-white"
@@ -40,7 +40,7 @@ export function ServiceSidebar({ activeSlug }: ServiceSidebarProps) {
       </div>
 
       {/* Contact Widget */}
-      <div className="bg-[var(--pub-dark)] p-8 lg:p-10 rounded-[20px] text-white relative overflow-hidden">
+      <div className="bg-[var(--pub-dark)] p-8 lg:p-10 rounded-md text-white relative overflow-hidden">
         <div className="relative z-10">
           <div className="w-16 h-16 rounded-full bg-[rgba(255,255,255,0.1)] flex items-center justify-center mb-6">
              <Image 

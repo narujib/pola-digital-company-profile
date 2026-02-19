@@ -10,7 +10,7 @@ interface BenefitItemProps {
 export function BenefitItem({ title, desc, icon, delayIndex }: BenefitItemProps) {
   return (
     <div
-      className="flex gap-5 items-start bg-white/10 p-8 rounded-2xl transition-all duration-300 hover:bg-[var(--pub-accent)] group"
+      className="flex gap-5 items-start bg-white/10 p-8 rounded-md transition-all duration-300 hover:bg-[var(--pub-accent)] group"
       data-aos="fade-left"
       data-aos-delay={delayIndex * 200 + 200}
     >

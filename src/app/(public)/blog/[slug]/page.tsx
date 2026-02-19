@@ -1,108 +1,86 @@
-import { type Metadata } from "next";
-import Link from "next/link";
+import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import { getBlogBySlug } from "@/modules/blog/blog.service";
-import { formatDate } from "@/lib/utils";
+import { BreadcrumbBanner } from "@/components/ui/breadcrumb-banner";
+import { BlogSidebar } from "@/components/sections/blog/blog-sidebar";
+import { BlogDetailsContent } from "@/components/sections/blog/blog-details-content";
+import { blogPosts } from "@/content/blog";
 
-type Params = Promise<{ slug: string }>;
-
-export async function generateMetadata({ params }: { params: Params }): Promise<Metadata> {
-  const { slug } = await params;
-  
-  try {
-    const blog = await getBlogBySlug(slug, "author") as unknown as {
-      title: string;
-      excerpt: string;
-      createdAt: Date;
-      thumbnail: string | null;
-      author: { name: string };
-    };
-    
-    return {
-      title: blog.title,
-      description: blog.excerpt,
-      openGraph: {
-        title: blog.title,
-        description: blog.excerpt,
-        type: "article",
-        publishedTime: blog.createdAt.toISOString(),
-        authors: [blog.author.name],
-        images: blog.thumbnail ? [blog.thumbnail] : [],
-      },
-      twitter: {
-        card: "summary_large_image",
-        title: blog.title,
-        description: blog.excerpt,
-        images: blog.thumbnail ? [blog.thumbnail] : [],
-      },
-    };
-  } catch {
-    return {
-      title: "Blog Not Found",
-    };
-  }
+interface BlogDetailsPageProps {
+  params: Promise<{
+    slug: string;
+  }>;
 }
 
-export default async function BlogDetailPage({
-  params,
-}: {
-  params: Params;
-}) {
+export async function generateMetadata({ params }: BlogDetailsPageProps): Promise<Metadata> {
   const { slug } = await params;
+  const post = blogPosts.find((p) => p.slug === slug);
 
-  let blog;
-  try {
-    // Assert type since dynamic include is tricky for TS inference here without generics
-    blog = await getBlogBySlug(slug, "author") as unknown as {
-      title: string;
-      content: string;
-      createdAt: Date;
-      thumbnail: string | null;
-      author: { name: string };
+  if (!post) {
+    return {
+      title: "Artikel Tidak Ditemukan",
     };
-  } catch {
+  }
+
+  return {
+    title: `${post.title} - Blog Pola Digital`,
+    description: post.excerpt,
+  };
+}
+
+export default async function BlogDetailsPage({ params }: BlogDetailsPageProps) {
+  const { slug } = await params;
+  const post = blogPosts.find((p) => p.slug === slug);
+
+  if (!post) {
     notFound();
   }
 
   return (
-    <main className="min-h-screen py-12 px-4 sm:px-6 lg:px-8">
-      <article className="max-w-3xl mx-auto">
-        {/* Header */}
-        <header className="mb-8">
-          <Link
-            href="/blog"
-            className="text-sm font-medium text-muted-foreground hover:text-foreground mb-4 inline-flex items-center gap-1"
-          >
-            ← Kembali ke Blog
-          </Link>
-          <div className="flex items-center gap-2 text-sm text-muted-foreground mb-4">
-            <time dateTime={blog.createdAt.toISOString()}>
-              {formatDate(blog.createdAt)}
-            </time>
-            <span>•</span>
-            <span>{blog.author.name}</span>
-          </div>
-          <h1 className="text-3xl sm:text-4xl font-extrabold tracking-tight text-foreground mb-4">
-            {blog.title}
-          </h1>
-          {blog.thumbnail && (
-            <div className="relative aspect-video w-full overflow-hidden rounded-lg mb-8 bg-muted">
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
-                src={blog.thumbnail}
-                alt={blog.title}
-                className="object-cover w-full h-full"
-              />
-            </div>
-          )}
-        </header>
+    <main>
+      <BreadcrumbBanner
+        title={post.title}
+        paths={[
+          { label: "Beranda", href: "/" },
+          { label: "Blog", href: "/blog" },
+          { label: "Detail Artikel" },
+        ]}
+      />
 
-        {/* Content */}
-        <div
-          className="prose prose-lg dark:prose-invert max-w-none break-words"
-          dangerouslySetInnerHTML={{ __html: blog.content }}
-        />
-      </article>
+      <section className="py-20 lg:py-28 bg-[#fdfdfd]">
+        <div className="pub-container">
+          <div className="flex flex-col lg:flex-row gap-12 xl:gap-20">
+            {/* Main Content */}
+            <div className="w-full lg:w-2/3">
+              <BlogDetailsContent post={post} />
+              
+              {/* Author Box - matching template */}
+              <div className="bg-white border border-gray-100 p-8 lg:p-10 rounded-md flex flex-col md:flex-row gap-8 mt-16 shadow-sm">
+                <div className="relative size-24 lg:size-32 shrink-0 rounded-md overflow-hidden">
+                  <Image
+                    src={post.author.avatar}
+                    alt={post.author.name}
+                    fill
+                    className="object-cover"
+                  />
+                </div>
+                <div className="flex flex-col gap-4">
+                  <h4 className="pub-h4 text-[var(--pub-dark)]">{post.author.name}</h4>
+                  <p className="text-[var(--pub-body)] leading-relaxed">
+                    {post.author.bio || "Penulis ahli yang berfokus pada konten berkualitas tinggi untuk audiens modern. Berdedikasi untuk berbagi pengetahuan dan wawasan terbaru."}
+                  </p>
+                </div>
+              </div>
+            </div>
+            {/* Sidebar */}
+            <div className="w-full lg:w-1/3">
+              <BlogSidebar />
+            </div>
+          </div>
+        </div>
+      </section>
     </main>
   );
 }
+
+// Add Next.js Image import which was missing in the implementation
+import Image from "next/image";

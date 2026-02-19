@@ -39,7 +39,7 @@ export function HeroSection() {
                 data-aos="fade-up"
                 data-aos-delay="200"
               >
-                <div className="relative rounded-3xl overflow-hidden shadow-xl aspect-[636/650]">
+                <div className="relative rounded-md overflow-hidden shadow-xl aspect-[636/650]">
                   <Image
                     src={heroContent.mainImage}
                     alt="Hero Image"
@@ -52,7 +52,7 @@ export function HeroSection() {
 
                 {/* Floating Small Image */}
                 <div
-                  className="absolute -bottom-10 -left-10 md:bottom-10 md:-left-20 w-[200px] md:w-[280px] rounded-2xl overflow-hidden border-4 border-white shadow-2xl float-bob-y z-20 hidden md:block aspect-[324/214]"
+                  className="absolute -bottom-10 -left-10 md:bottom-10 md:-left-20 w-[200px] md:w-[280px] rounded-md overflow-hidden border-4 border-white shadow-2xl float-bob-y z-20 hidden md:block aspect-[324/214]"
                   data-aos="fade-up"
                   data-aos-delay="400"
                 >

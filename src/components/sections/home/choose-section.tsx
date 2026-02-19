@@ -35,7 +35,7 @@ export function ChooseSection({ className }: ChooseSectionProps) {
                 </Link>
              </div>
              
-             <div className="rounded-2xl overflow-hidden mt-auto w-full aspect-[770/400]">
+             <div className="rounded-md overflow-hidden mt-auto w-full aspect-[770/400]">
                <Image 
                  src={chooseContent.image} 
                  alt="Choose Us" 

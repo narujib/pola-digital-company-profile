@@ -16,7 +16,7 @@ export function MissionSection() {
             data-aos="fade-right"
             data-aos-delay="200"
           >
-            <div className="relative rounded-2xl overflow-hidden max-w-lg w-full aspect-[636/700]">
+            <div className="relative rounded-md overflow-hidden max-w-lg w-full aspect-[636/700]">
               <Image
                 src={missionContent.image}
                 alt="Mission"

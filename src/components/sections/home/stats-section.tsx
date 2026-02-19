@@ -8,10 +8,15 @@ interface StatsSectionProps {
 
 export function StatsSection({ className }: StatsSectionProps) {
   return (
-    <section className={cn("relative py-20 lg:py-28 bg-[#063231] overflow-hidden text-white", className)}>
+    <section
+      className={cn(
+        "relative py-20 lg:py-28 bg-[#063231] overflow-hidden text-white",
+        className,
+      )}
+    >
       <div className="pub-container relative z-10">
         <div
-          className="bg-white/10 rounded-3xl p-12 lg:p-16"
+          className="bg-white/10 rounded-md p-12 lg:p-16"
           data-aos="fade-up"
           data-aos-delay="200"
         >

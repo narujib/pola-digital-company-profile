@@ -10,7 +10,7 @@ export function ServiceDetailsContent({ service }: ServiceDetailsContentProps) {
   return (
     <article className="service-details-content">
       {/* Main Image */}
-      <div className="rounded-[40px] overflow-hidden mb-12 aspect-[870/500]" data-aos="fade-up">
+      <div className="rounded-md overflow-hidden mb-12 aspect-[870/500]" data-aos="fade-up">
         <Image
           src={service.image}
           alt={service.title}
@@ -39,7 +39,7 @@ export function ServiceDetailsContent({ service }: ServiceDetailsContentProps) {
         {service.subImages.map((img, idx) => (
           <div 
             key={idx} 
-            className="rounded-3xl overflow-hidden aspect-[420/280]" 
+            className="rounded-md overflow-hidden aspect-[420/280]" 
             data-aos="zoom-in" 
             data-aos-delay={idx * 200}
           >
@@ -65,7 +65,7 @@ export function ServiceDetailsContent({ service }: ServiceDetailsContentProps) {
         {service.features.map((feature, idx) => (
           <li 
             key={idx} 
-            className="flex items-center gap-4 bg-[#F5F7F7] p-4 rounded-xl"
+            className="flex items-center gap-4 bg-[#F5F7F7] p-4 rounded-md"
             data-aos="fade-up"
             data-aos-delay={idx * 100}
           >

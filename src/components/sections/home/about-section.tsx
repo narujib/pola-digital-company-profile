@@ -17,7 +17,7 @@ export function AboutSection() {
             data-aos="fade-right"
             data-aos-delay="200"
           >
-            <div className="relative rounded-2xl overflow-hidden max-w-lg w-full aspect-[636/700]">
+            <div className="relative rounded-md overflow-hidden max-w-lg w-full aspect-[636/700]">
               <Image
                 src={aboutContent.image}
                 alt="About Company"
@@ -27,7 +27,7 @@ export function AboutSection() {
               />
             </div>
             {/* Floating Badge */}
-            <div className="absolute top-10 right-10 md:right-20 bg-[var(--pub-accent)] text-white p-6 rounded-xl shadow-xl float-bob-y max-w-[150px] text-center">
+            <div className="absolute top-10 right-10 md:right-20 bg-[var(--pub-accent)] text-white p-6 rounded-md shadow-xl float-bob-y max-w-[150px] text-center">
               <div className="text-4xl font-bold mb-1">
                 <AnimatedCounter end={aboutContent.clientReviewCount} suffix={aboutContent.clientReviewSuffix} />
               </div>

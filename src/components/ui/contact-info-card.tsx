@@ -17,7 +17,7 @@ export function ContactInfoCard({
 }: ContactInfoCardProps) {
   return (
     <div
-      className="bg-[#F5F7F7] p-10 rounded-[20px] transition-all duration-300 group min-h-full"
+      className="bg-[#F5F7F7] p-10 rounded-md transition-all duration-300 group min-h-full"
       data-aos="fade-up"
       data-aos-delay={delayIndex * 300 + 300}
     >

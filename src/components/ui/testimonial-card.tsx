@@ -10,7 +10,7 @@ interface TestimonialCardProps {
 
 export function TestimonialCard({ text, name, role, image }: TestimonialCardProps) {
   return (
-    <div className="bg-white p-10 rounded-2xl h-full flex flex-col shadow-sm">
+    <div className="bg-white p-10 rounded-md h-full flex flex-col shadow-sm">
       <div className="flex gap-1 text-[#FFB800] mb-6">
         {[1, 2, 3, 4, 5].map((star) => (
           <Star key={star} className="size-4 fill-current" />
