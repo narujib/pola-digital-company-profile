@@ -49,53 +49,67 @@ async function main() {
     return;
   }
 
-  const blogs = [
-    {
-      title: "Membangun Aplikasi Web Modern dengan Next.js",
-      slug: "membangun-aplikasi-web-modern-dengan-nextjs",
-      content:
-        "Next.js adalah framework React yang powerful untuk membangun aplikasi web modern. Dengan fitur seperti Server-Side Rendering (SSR), Static Site Generation (SSG), dan API Routes, Next.js menjadi pilihan utama bagi banyak developer.\n\nDalam artikel ini, kita akan membahas mengapa Next.js menjadi begitu populer dan bagaimana memulai proyek pertama Anda dengan framework ini.\n\n## Mengapa Next.js?\n\n1. **Performance** - Optimasi otomatis untuk kecepatan loading\n2. **SEO Friendly** - SSR dan SSG untuk indexing yang lebih baik\n3. **Developer Experience** - Hot reload, TypeScript support built-in\n4. **Deployment Mudah** - Deploy ke Vercel dengan satu klik",
-      excerpt:
-        "Pelajari cara membangun aplikasi web modern dengan Next.js, framework React yang powerful dengan fitur SSR, SSG, dan API Routes.",
-      isPublished: true,
-    },
-    {
-      title: "Panduan Lengkap Tailwind CSS untuk Pemula",
-      slug: "panduan-lengkap-tailwind-css-untuk-pemula",
-      content:
-        "Tailwind CSS adalah utility-first CSS framework yang memungkinkan Anda membangun desain custom tanpa meninggalkan HTML.\n\nBerbeda dengan framework CSS tradisional seperti Bootstrap, Tailwind memberikan kebebasan penuh dalam mendesain UI tanpa perlu menulis CSS custom.\n\n## Keunggulan Tailwind CSS\n\n- Utility-first approach\n- Highly customizable\n- Responsive design built-in\n- Dark mode support\n- Active community",
-      excerpt:
-        "Mulai belajar Tailwind CSS dari dasar. Panduan lengkap untuk pemula yang ingin menguasai utility-first CSS framework.",
-      isPublished: true,
-    },
-    {
-      title: "Best Practices dalam Pengembangan REST API",
-      slug: "best-practices-pengembangan-rest-api",
-      content:
-        "REST API adalah fondasi dari komunikasi antara frontend dan backend di aplikasi modern. Membangun API yang baik memerlukan pemahaman tentang best practices.\n\n## Prinsip Dasar\n\n1. Gunakan HTTP methods dengan benar (GET, POST, PUT, DELETE)\n2. Konsisten dalam penamaan endpoint\n3. Gunakan status code yang tepat\n4. Implementasi pagination untuk list endpoints\n5. Validasi input di sisi server",
-      excerpt:
-        "Pelajari best practices dalam membangun REST API yang bersih, konsisten, dan mudah digunakan oleh tim frontend.",
-      isPublished: true,
-    },
-    {
-      title: "Mengenal TypeScript: Superset JavaScript yang Type-Safe",
-      slug: "mengenal-typescript-superset-javascript-type-safe",
-      content:
-        "TypeScript menambahkan static typing ke JavaScript, membantu developer mendeteksi error lebih awal dan menulis kode yang lebih maintainable.\n\n## Fitur Utama TypeScript\n\n- Static type checking\n- Interface dan type aliases\n- Generics\n- Enums\n- Decorators",
-      excerpt:
-        "Pengenalan TypeScript untuk developer JavaScript. Pelajari mengapa TypeScript menjadi standar baru dalam pengembangan web.",
-      isPublished: false,
-    },
-    {
-      title: "Optimasi Performa Database PostgreSQL",
-      slug: "optimasi-performa-database-postgresql",
-      content:
-        "PostgreSQL adalah salah satu database relasional paling powerful. Namun, tanpa optimasi yang tepat, performa bisa menurun seiring pertumbuhan data.\n\n## Tips Optimasi\n\n1. Gunakan indexing dengan bijak\n2. Analisis query plan dengan EXPLAIN ANALYZE\n3. Partitioning untuk tabel besar\n4. Connection pooling\n5. Vacuum dan maintenance rutin",
-      excerpt:
-        "Tips dan trik untuk mengoptimalkan performa database PostgreSQL agar aplikasi Anda tetap cepat dan responsif.",
-      isPublished: false,
-    },
+  const topics = [
+    { category: "Web Development", subjects: ["Next.js", "React", "Vue.js", "Angular", "Svelte", "Astro", "Remix", "Nuxt.js"] },
+    { category: "Mobile Development", subjects: ["Flutter", "React Native", "Swift", "Kotlin", "Ionic", "Capacitor"] },
+    { category: "DevOps", subjects: ["Docker", "Kubernetes", "CI/CD", "GitHub Actions", "Terraform", "Ansible"] },
+    { category: "Design", subjects: ["Figma", "UI/UX", "Design System", "Tailwind CSS", "CSS Grid", "Animasi Web"] },
+    { category: "Data", subjects: ["PostgreSQL", "MongoDB", "Redis", "Prisma ORM", "GraphQL", "REST API"] },
+    { category: "Security", subjects: ["JWT Authentication", "OAuth 2.0", "CORS", "HTTPS", "Input Validation"] },
+    { category: "Cloud", subjects: ["AWS", "Google Cloud", "Vercel", "Supabase", "Firebase", "Cloudflare"] },
+    { category: "AI & ML", subjects: ["Machine Learning", "ChatGPT API", "TensorFlow.js", "LangChain", "AI Agents"] },
   ];
+
+  const templates = [
+    { prefix: "Panduan Lengkap", excerpt: "Panduan komprehensif untuk memahami dan menggunakan" },
+    { prefix: "Memulai dengan", excerpt: "Langkah awal untuk memulai menggunakan" },
+    { prefix: "Best Practices", excerpt: "Kumpulan best practices dalam penggunaan" },
+    { prefix: "Tips & Trik", excerpt: "Tips dan trik praktis untuk mengoptimalkan penggunaan" },
+    { prefix: "Studi Kasus:", excerpt: "Studi kasus nyata dalam implementasi" },
+    { prefix: "Perbandingan", excerpt: "Analisis mendalam membandingkan" },
+    { prefix: "Optimasi Performa", excerpt: "Cara mengoptimalkan performa dengan" },
+  ];
+
+  function slugify(text: string): string {
+    return text
+      .toLowerCase()
+      .replace(/[^a-z0-9\s-]/g, "")
+      .replace(/\s+/g, "-")
+      .replace(/-+/g, "-")
+      .trim();
+  }
+
+  const blogs: {
+    title: string;
+    slug: string;
+    content: string;
+    excerpt: string;
+    isPublished: boolean;
+    createdAt: Date;
+  }[] = [];
+
+  for (let i = 0; i < 50; i++) {
+    const topic = topics[i % topics.length];
+    const subject = topic.subjects[i % topic.subjects.length];
+    const template = templates[i % templates.length];
+
+    const title = `${template.prefix} ${subject} di ${topic.category}`;
+    const slug = slugify(title) + `-${i + 1}`;
+    const isPublished = i % 10 < 7; // 70% published, 30% draft
+
+    // Stagger creation dates over the last 6 months
+    const daysAgo = Math.floor((50 - i) * 3.6);
+    const createdAt = new Date(Date.now() - daysAgo * 24 * 60 * 60 * 1000);
+
+    blogs.push({
+      title,
+      slug,
+      content: `${subject} adalah teknologi penting dalam ${topic.category}.\n\n## Pendahuluan\n\nDalam artikel ini kita akan membahas tentang ${subject} secara mendalam, termasuk cara penggunaan, best practices, dan tips praktis.\n\n## Mengapa ${subject}?\n\n1. **Populer** — Banyak digunakan oleh developer di seluruh dunia\n2. **Powerful** — Fitur lengkap untuk kebutuhan ${topic.category.toLowerCase()}\n3. **Community** — Komunitas aktif dan dokumentasi yang baik\n4. **Scalable** — Cocok untuk proyek kecil hingga enterprise\n\n## Kesimpulan\n\n${subject} adalah pilihan yang solid untuk ${topic.category.toLowerCase()}. Dengan memahami konsep dasar dan best practices, Anda bisa memaksimalkan potensi teknologi ini dalam proyek Anda.`,
+      excerpt: `${template.excerpt} ${subject} dalam ${topic.category.toLowerCase()}. Cocok untuk pemula maupun developer berpengalaman.`,
+      isPublished,
+      createdAt,
+    });
+  }
 
   for (const blog of blogs) {
     await prisma.blog.create({
@@ -106,7 +120,9 @@ async function main() {
     });
   }
 
-  console.log(`✅ ${blogs.length} blog berhasil dibuat (3 published, 2 draft).`);
+  const published = blogs.filter((b) => b.isPublished).length;
+  const draft = blogs.length - published;
+  console.log(`✅ ${blogs.length} blog berhasil dibuat (${published} published, ${draft} draft).`);
 }
 
 main()

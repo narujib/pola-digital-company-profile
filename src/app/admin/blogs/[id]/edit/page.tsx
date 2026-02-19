@@ -19,6 +19,7 @@ import {
   FieldLabel,
 } from "@/components/ui/field";
 import { Loader2 } from "lucide-react";
+import { toast } from "sonner";
 
 const breadcrumbItems = [
   { label: "Dashboard", href: "/admin/dashboard" },
@@ -48,9 +49,10 @@ function EditBlogForm({ blog }: { blog: Blog }) {
         thumbnail: thumbnail || undefined,
         isPublished,
       });
+      toast.success("Blog berhasil diupdate");
       router.push("/admin/blogs");
     } catch {
-      // error handled by hook
+      toast.error("Gagal mengupdate blog");
     }
   }
 

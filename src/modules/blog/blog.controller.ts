@@ -1,7 +1,7 @@
 import { NextRequest } from "next/server";
 import { jsonApiSingle, jsonApiList, jsonApiMeta, jsonApiError } from "@/utils/response";
 import { withErrorHandler } from "@/utils/error-handler";
-import { createBlogSchema, updateBlogSchema, querySchema } from "./blog.validation";
+import { createBlogSchema, updateBlogSchema, querySchema, parseJsonApiQuery } from "./blog.validation";
 import * as blogService from "./blog.service";
 
 // ==========================================
@@ -83,7 +83,7 @@ export async function getBlogByIdController(
 
 export const getAllBlogsController = withErrorHandler(async (req: NextRequest) => {
   const { searchParams } = new URL(req.url);
-  const queryObj = Object.fromEntries(searchParams.entries());
+  const queryObj = parseJsonApiQuery(searchParams);
 
   const result = querySchema.safeParse(queryObj);
   if (!result.success) {

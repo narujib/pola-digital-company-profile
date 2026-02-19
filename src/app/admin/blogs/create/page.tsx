@@ -19,6 +19,7 @@ import {
   FieldLabel,
 } from "@/components/ui/field";
 import { Loader2 } from "lucide-react";
+import { toast } from "sonner";
 
 export default function AdminCreateBlogPage() {
   const router = useRouter();
@@ -41,9 +42,10 @@ export default function AdminCreateBlogPage() {
         thumbnail: thumbnail || undefined,
         isPublished,
       });
+      toast.success("Blog berhasil dibuat");
       router.push("/admin/blogs");
     } catch {
-      // error handled by hook
+      toast.error("Gagal membuat blog");
     }
   }
 

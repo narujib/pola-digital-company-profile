@@ -112,11 +112,11 @@ export async function fetchBlogs(
   params?: FetchBlogsParams
 ): Promise<BlogListResponse> {
   const searchParams = new URLSearchParams();
-  if (params?.page) searchParams.set("page", String(params.page));
-  if (params?.limit) searchParams.set("limit", String(params.limit));
-  if (params?.search) searchParams.set("search", params.search);
+  if (params?.page) searchParams.set("page[number]", String(params.page));
+  if (params?.limit) searchParams.set("page[size]", String(params.limit));
+  if (params?.search) searchParams.set("filter[search]", params.search);
   if (params?.published !== undefined)
-    searchParams.set("published", String(params.published));
+    searchParams.set("filter[published]", String(params.published));
   if (params?.include) searchParams.set("include", params.include);
 
   const qs = searchParams.toString();
