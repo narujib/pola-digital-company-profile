@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
-import { fetchBlogs, deleteBlog } from "@/features/blog/blog.api";
+import { fetchBlogs, deleteBlog, createBlog } from "@/features/blog/blog.api";
 
 interface UseBlogsParams {
   page?: number;
@@ -96,3 +96,41 @@ export function useDeleteBlog(): UseDeleteBlogResult {
   return { deleteBlogById, loading, error };
 }
 
+// ==========================================
+// useCreateBlog
+// ==========================================
+
+export interface CreateBlogPayload {
+  title: string;
+  content: string;
+  excerpt: string;
+  thumbnail?: string;
+  isPublished: boolean;
+}
+
+interface UseCreateBlogResult {
+  create: (payload: CreateBlogPayload) => Promise<void>;
+  loading: boolean;
+  error: string | null;
+}
+
+export function useCreateBlog(): UseCreateBlogResult {
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const create = useCallback(async (payload: CreateBlogPayload) => {
+    setLoading(true);
+    setError(null);
+    try {
+      await createBlog(payload);
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : "Gagal membuat blog";
+      setError(msg);
+      throw err;
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  return { create, loading, error };
+}
