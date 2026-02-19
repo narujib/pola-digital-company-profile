@@ -8,6 +8,7 @@ export const createBlogSchema = z.object({
   slug: z
     .string()
     .max(255, "Slug maksimal 255 karakter")
+    .regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/, "Slug hanya boleh berisi huruf kecil, angka, dan tanda hubung (-)")
     .optional(),
   content: z
     .string()
@@ -34,6 +35,7 @@ export const updateBlogSchema = z.object({
   slug: z
     .string()
     .max(255, "Slug maksimal 255 karakter")
+    .regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/, "Slug hanya boleh berisi huruf kecil, angka, dan tanda hubung (-)")
     .optional(),
   content: z
     .string()

@@ -1,12 +1,52 @@
+import { type Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getBlogBySlug } from "@/modules/blog/blog.service";
 import { formatDate } from "@/lib/utils";
 
+type Params = Promise<{ slug: string }>;
+
+export async function generateMetadata({ params }: { params: Params }): Promise<Metadata> {
+  const { slug } = await params;
+  
+  try {
+    const blog = await getBlogBySlug(slug, "author") as unknown as {
+      title: string;
+      excerpt: string;
+      createdAt: Date;
+      thumbnail: string | null;
+      author: { name: string };
+    };
+    
+    return {
+      title: blog.title,
+      description: blog.excerpt,
+      openGraph: {
+        title: blog.title,
+        description: blog.excerpt,
+        type: "article",
+        publishedTime: blog.createdAt.toISOString(),
+        authors: [blog.author.name],
+        images: blog.thumbnail ? [blog.thumbnail] : [],
+      },
+      twitter: {
+        card: "summary_large_image",
+        title: blog.title,
+        description: blog.excerpt,
+        images: blog.thumbnail ? [blog.thumbnail] : [],
+      },
+    };
+  } catch {
+    return {
+      title: "Blog Not Found",
+    };
+  }
+}
+
 export default async function BlogDetailPage({
   params,
 }: {
-  params: Promise<{ slug: string }>;
+  params: Params;
 }) {
   const { slug } = await params;
 

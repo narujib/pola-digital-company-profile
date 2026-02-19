@@ -22,6 +22,11 @@ export interface Blog {
   authorId: string;
   createdAt: string;
   updatedAt: string;
+  author?: {
+    id: string;
+    name: string;
+    email: string;
+  };
 }
 
 interface UseBlogsResult {
