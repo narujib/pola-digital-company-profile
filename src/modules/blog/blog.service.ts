@@ -83,6 +83,18 @@ export async function deleteBlog(id: string) {
 }
 
 // ==========================================
+// Get Blog by ID (Admin)
+// ==========================================
+
+export async function getBlogById(id: string) {
+  const blog = await blogRepo.findById(id);
+  if (!blog) {
+    throw new BlogError("NOT_FOUND", "Blog tidak ditemukan");
+  }
+  return blog;
+}
+
+// ==========================================
 // Get Blog by Slug
 // ==========================================
 

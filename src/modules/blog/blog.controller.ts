@@ -5,6 +5,21 @@ import { createBlogSchema, updateBlogSchema, querySchema } from "./blog.validati
 import * as blogService from "./blog.service";
 
 // ==========================================
+// Get Blog by ID (Admin)
+// ==========================================
+
+export async function getBlogByIdController(
+  req: NextRequest,
+  id: string
+) {
+  return withErrorHandler(async () => {
+    const blog = await blogService.getBlogById(id);
+    return successResponse({ data: blog });
+  })(req);
+}
+
+
+// ==========================================
 // Get All Blogs (Public)
 // ==========================================
 

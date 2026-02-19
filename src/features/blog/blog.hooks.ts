@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
-import { fetchBlogs, deleteBlog, createBlog } from "@/features/blog/blog.api";
+import { fetchBlogs, fetchBlogById, deleteBlog, createBlog, updateBlog } from "@/features/blog/blog.api";
 
 interface UseBlogsParams {
   page?: number;
@@ -133,4 +133,69 @@ export function useCreateBlog(): UseCreateBlogResult {
   }, []);
 
   return { create, loading, error };
+}
+
+// ==========================================
+// useBlogById
+// ==========================================
+
+interface UseBlogByIdResult {
+  blog: Blog | null;
+  loading: boolean;
+  error: string | null;
+}
+
+export function useBlogById(id: string): UseBlogByIdResult {
+  const [blog, setBlog] = useState<Blog | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    async function load() {
+      setLoading(true);
+      setError(null);
+      try {
+        const result = await fetchBlogById(id);
+        setBlog(result.data);
+      } catch (err) {
+        setError(err instanceof Error ? err.message : "Gagal memuat blog");
+      } finally {
+        setLoading(false);
+      }
+    }
+    load();
+  }, [id]);
+
+  return { blog, loading, error };
+}
+
+// ==========================================
+// useUpdateBlog
+// ==========================================
+
+interface UseUpdateBlogResult {
+  update: (id: string, payload: Partial<CreateBlogPayload>) => Promise<void>;
+  loading: boolean;
+  error: string | null;
+}
+
+export function useUpdateBlog(): UseUpdateBlogResult {
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const update = useCallback(async (id: string, payload: Partial<CreateBlogPayload>) => {
+    setLoading(true);
+    setError(null);
+    try {
+      await updateBlog(id, payload);
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : "Gagal mengupdate blog";
+      setError(msg);
+      throw err;
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  return { update, loading, error };
 }

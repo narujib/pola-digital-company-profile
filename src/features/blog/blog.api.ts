@@ -83,6 +83,10 @@ export function fetchBlogBySlug(
   return httpGet<BlogDetailResponse>(`/api/blogs/${slug}${qs}`);
 }
 
+export function fetchBlogById(id: string): Promise<BlogDetailResponse> {
+  return httpGet<BlogDetailResponse>(`/api/admin/blogs/${id}`);
+}
+
 export function createBlog(
   payload: Partial<Blog>
 ): Promise<BlogMutationResponse> {
