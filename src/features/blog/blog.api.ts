@@ -22,8 +22,35 @@ interface Blog {
   };
 }
 
+// JSON:API response shapes
+interface JsonApiResource<A = Record<string, unknown>> {
+  type: string;
+  id: string;
+  attributes: A;
+  relationships?: Record<
+    string,
+    { data: { type: string; id: string } }
+  >;
+}
+
+interface JsonApiSingleResponse<A = Record<string, unknown>> {
+  data: JsonApiResource<A>;
+  included?: JsonApiResource[];
+  meta?: Record<string, unknown>;
+}
+
+interface JsonApiListResponse<A = Record<string, unknown>> {
+  data: JsonApiResource<A>[];
+  included?: JsonApiResource[];
+  meta?: Record<string, unknown>;
+}
+
+interface JsonApiMetaResponse {
+  meta: Record<string, unknown>;
+}
+
+// Flat response shapes (consumed by hooks)
 interface BlogListResponse {
-  success: true;
   data: Blog[];
   meta: {
     page: number;
@@ -34,18 +61,7 @@ interface BlogListResponse {
 }
 
 interface BlogDetailResponse {
-  success: true;
   data: Blog;
-}
-
-interface BlogMutationResponse {
-  success: true;
-  data: Blog;
-}
-
-interface DeleteResponse {
-  success: true;
-  data: { message: string };
 }
 
 interface FetchBlogsParams {
@@ -57,10 +73,42 @@ interface FetchBlogsParams {
 }
 
 // ==========================================
+// Deserialization
+// ==========================================
+
+type BlogAttributes = Omit<Blog, "id" | "author">;
+
+function deserializeBlog(
+  resource: JsonApiResource<BlogAttributes>,
+  included?: JsonApiResource[]
+): Blog {
+  const blog: Blog = {
+    id: resource.id,
+    ...resource.attributes,
+  };
+
+  // Resolve author from included
+  if (included && resource.relationships?.author) {
+    const authorRef = resource.relationships.author.data;
+    const authorResource = included.find(
+      (r) => r.type === authorRef.type && r.id === authorRef.id
+    );
+    if (authorResource) {
+      blog.author = {
+        id: authorResource.id,
+        ...(authorResource.attributes as { name: string; email: string }),
+      };
+    }
+  }
+
+  return blog;
+}
+
+// ==========================================
 // API Functions
 // ==========================================
 
-export function fetchBlogs(
+export async function fetchBlogs(
   params?: FetchBlogsParams
 ): Promise<BlogListResponse> {
   const searchParams = new URLSearchParams();
@@ -72,34 +120,59 @@ export function fetchBlogs(
   if (params?.include) searchParams.set("include", params.include);
 
   const qs = searchParams.toString();
-  return httpGet<BlogListResponse>(`/api/blogs${qs ? `?${qs}` : ""}`);
+  const raw = await httpGet<JsonApiListResponse<BlogAttributes>>(
+    `/api/blogs${qs ? `?${qs}` : ""}`
+  );
+
+  return {
+    data: raw.data.map((r) => deserializeBlog(r, raw.included)),
+    meta: raw.meta as BlogListResponse["meta"],
+  };
 }
 
-export function fetchBlogBySlug(
+export async function fetchBlogBySlug(
   slug: string,
   include?: string
 ): Promise<BlogDetailResponse> {
   const qs = include ? `?include=${include}` : "";
-  return httpGet<BlogDetailResponse>(`/api/blogs/${slug}${qs}`);
+  const raw = await httpGet<JsonApiSingleResponse<BlogAttributes>>(
+    `/api/blogs/${slug}${qs}`
+  );
+
+  return { data: deserializeBlog(raw.data, raw.included) };
 }
 
-export function fetchBlogById(id: string): Promise<BlogDetailResponse> {
-  return httpGet<BlogDetailResponse>(`/api/admin/blogs/${id}`);
+export async function fetchBlogById(id: string): Promise<BlogDetailResponse> {
+  const raw = await httpGet<JsonApiSingleResponse<BlogAttributes>>(
+    `/api/admin/blogs/${id}`
+  );
+
+  return { data: deserializeBlog(raw.data, raw.included) };
 }
 
-export function createBlog(
+export async function createBlog(
   payload: Partial<Blog>
-): Promise<BlogMutationResponse> {
-  return httpPost<BlogMutationResponse>("/api/admin/blogs", payload);
+): Promise<BlogDetailResponse> {
+  const raw = await httpPost<JsonApiSingleResponse<BlogAttributes>>(
+    "/api/admin/blogs",
+    payload
+  );
+
+  return { data: deserializeBlog(raw.data) };
 }
 
-export function updateBlog(
+export async function updateBlog(
   id: string,
   payload: Partial<Blog>
-): Promise<BlogMutationResponse> {
-  return httpPut<BlogMutationResponse>(`/api/admin/blogs/${id}`, payload);
+): Promise<BlogDetailResponse> {
+  const raw = await httpPut<JsonApiSingleResponse<BlogAttributes>>(
+    `/api/admin/blogs/${id}`,
+    payload
+  );
+
+  return { data: deserializeBlog(raw.data) };
 }
 
-export function deleteBlog(id: string): Promise<DeleteResponse> {
-  return httpDelete<DeleteResponse>(`/api/admin/blogs/${id}`);
+export async function deleteBlog(id: string): Promise<{ meta: { message: string } }> {
+  return httpDelete<JsonApiMetaResponse>(`/api/admin/blogs/${id}`) as Promise<{ meta: { message: string } }>;
 }

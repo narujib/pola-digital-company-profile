@@ -1,6 +1,6 @@
 import { NextRequest } from "next/server";
 import { verifyToken, JwtPayload } from "@/lib/jwt";
-import { errorResponse } from "@/utils/response";
+import { jsonApiError } from "@/utils/response";
 
 /**
  * Middleware untuk memverifikasi JWT token pada protected routes.
@@ -12,13 +12,13 @@ import { errorResponse } from "@/utils/response";
  */
 export function authenticateRequest(
   req: NextRequest
-): JwtPayload | ReturnType<typeof errorResponse> {
+): JwtPayload | ReturnType<typeof jsonApiError> {
   const authHeader = req.headers.get("authorization");
 
   if (!authHeader || !authHeader.startsWith("Bearer ")) {
-    return errorResponse({
+    return jsonApiError({
       code: "UNAUTHORIZED",
-      message: "Token tidak ditemukan",
+      detail: "Token tidak ditemukan",
       status: 401,
     });
   }
@@ -29,9 +29,9 @@ export function authenticateRequest(
     const payload = verifyToken(token);
     return payload;
   } catch {
-    return errorResponse({
+    return jsonApiError({
       code: "UNAUTHORIZED",
-      message: "Token tidak valid atau sudah expired",
+      detail: "Token tidak valid atau sudah expired",
       status: 401,
     });
   }
@@ -41,7 +41,7 @@ export function authenticateRequest(
  * Type guard untuk mengecek apakah hasil authenticate adalah JwtPayload
  */
 export function isAuthenticated(
-  result: JwtPayload | ReturnType<typeof errorResponse>
+  result: JwtPayload | ReturnType<typeof jsonApiError>
 ): result is JwtPayload {
   return "userId" in result;
 }

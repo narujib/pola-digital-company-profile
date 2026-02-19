@@ -5,8 +5,24 @@ interface LoginPayload {
   password: string;
 }
 
+// JSON:API response shape from login endpoint
+interface JsonApiLoginResponse {
+  data: {
+    type: string;
+    id: string;
+    attributes: {
+      token: string;
+      user: {
+        id: string;
+        name: string;
+        email: string;
+      };
+    };
+  };
+}
+
+// Flat response shape (consumed by AuthContext)
 interface LoginResponse {
-  success: true;
   data: {
     token: string;
     user: {
@@ -17,6 +33,13 @@ interface LoginResponse {
   };
 }
 
-export function loginRequest(payload: LoginPayload): Promise<LoginResponse> {
-  return httpPost<LoginResponse>("/api/auth/login", payload);
+export async function loginRequest(payload: LoginPayload): Promise<LoginResponse> {
+  const raw = await httpPost<JsonApiLoginResponse>("/api/auth/login", payload);
+
+  return {
+    data: {
+      token: raw.data.attributes.token,
+      user: raw.data.attributes.user,
+    },
+  };
 }

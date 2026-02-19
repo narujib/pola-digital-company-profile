@@ -1,8 +1,29 @@
 import { NextRequest } from "next/server";
-import { successResponse, errorResponse } from "@/utils/response";
+import { jsonApiSingle, jsonApiList, jsonApiError } from "@/utils/response";
 import { withErrorHandler } from "@/utils/error-handler";
 import { createContactSchema } from "./contact.validation";
 import * as contactService from "./contact.service";
+
+// ==========================================
+// Serialization Helper
+// ==========================================
+
+interface ContactRecord {
+  id: string;
+  name: string;
+  email: string;
+  message: string;
+  createdAt: Date;
+}
+
+function serializeContactAttributes(msg: ContactRecord) {
+  return {
+    name: msg.name,
+    email: msg.email,
+    message: msg.message,
+    createdAt: msg.createdAt.toISOString(),
+  };
+}
 
 // ==========================================
 // Submit Contact Message (Public)
@@ -14,16 +35,21 @@ export const submitContactController = withErrorHandler(
     const result = createContactSchema.safeParse(body);
 
     if (!result.success) {
-      return errorResponse({
+      return jsonApiError({
         code: "VALIDATION_ERROR",
-        message: result.error.issues[0].message,
+        detail: result.error.issues[0].message,
         status: 400,
       });
     }
 
-    const message = await contactService.submitMessage(result.data);
+    const message = await contactService.submitMessage(result.data) as ContactRecord;
 
-    return successResponse({ data: message, status: 201 });
+    return jsonApiSingle({
+      type: "contact-messages",
+      id: message.id,
+      attributes: serializeContactAttributes(message),
+      status: 201,
+    });
   }
 );
 
@@ -32,7 +58,13 @@ export const submitContactController = withErrorHandler(
 // ==========================================
 
 export const getAllMessagesController = withErrorHandler(async () => {
-  const messages = await contactService.getAllMessages();
+  const messages = await contactService.getAllMessages() as ContactRecord[];
 
-  return successResponse({ data: messages });
+  return jsonApiList({
+    type: "contact-messages",
+    items: messages.map((msg) => ({
+      id: msg.id,
+      attributes: serializeContactAttributes(msg),
+    })),
+  });
 });

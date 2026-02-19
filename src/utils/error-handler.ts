@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { errorResponse } from "@/utils/response";
+import { jsonApiError } from "@/utils/response";
 import { AuthError } from "@/modules/auth/auth.service";
 import { BlogError } from "@/modules/blog/blog.service";
 
@@ -63,7 +63,7 @@ type ControllerFn = (
  * ```ts
  * export const POST = withErrorHandler(async (req) => {
  *   // controller logic...
- *   return successResponse({ data });
+ *   return jsonApiSingle({ type, id, attributes });
  * });
  * ```
  */
@@ -78,9 +78,9 @@ export function withErrorHandler(fn: ControllerFn): ControllerFn {
         error instanceof BlogError ||
         error instanceof AppError
       ) {
-        return errorResponse({
+        return jsonApiError({
           code: error.code,
-          message: error.message,
+          detail: error.message,
           status: getErrorStatus(error),
         });
       }
@@ -88,18 +88,18 @@ export function withErrorHandler(fn: ControllerFn): ControllerFn {
       // Zod validation errors
       if (error && typeof error === "object" && "issues" in error) {
         const zodError = error as { issues: Array<{ message: string }> };
-        return errorResponse({
+        return jsonApiError({
           code: "VALIDATION_ERROR",
-          message: zodError.issues[0]?.message ?? "Validasi gagal",
+          detail: zodError.issues[0]?.message ?? "Validasi gagal",
           status: 400,
         });
       }
 
       // Unknown errors
       console.error("Unhandled error:", error);
-      return errorResponse({
+      return jsonApiError({
         code: "INTERNAL_ERROR",
-        message: "Terjadi kesalahan internal",
+        detail: "Terjadi kesalahan internal",
         status: 500,
       });
     }

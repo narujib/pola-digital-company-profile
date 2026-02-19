@@ -18,26 +18,62 @@ interface SubmitContactPayload {
   message: string;
 }
 
+// JSON:API response shapes
+interface JsonApiResource<A = Record<string, unknown>> {
+  type: string;
+  id: string;
+  attributes: A;
+}
+
+interface JsonApiSingleResponse<A = Record<string, unknown>> {
+  data: JsonApiResource<A>;
+}
+
+interface JsonApiListResponse<A = Record<string, unknown>> {
+  data: JsonApiResource<A>[];
+}
+
+// Flat response shapes (consumed by hooks)
 interface SubmitResponse {
-  success: true;
   data: ContactMessage;
 }
 
 interface MessagesResponse {
-  success: true;
   data: ContactMessage[];
+}
+
+// ==========================================
+// Deserialization
+// ==========================================
+
+type ContactAttributes = Omit<ContactMessage, "id">;
+
+function deserializeContact(resource: JsonApiResource<ContactAttributes>): ContactMessage {
+  return {
+    id: resource.id,
+    ...resource.attributes,
+  };
 }
 
 // ==========================================
 // API Functions
 // ==========================================
 
-export function submitContact(
+export async function submitContact(
   payload: SubmitContactPayload
 ): Promise<SubmitResponse> {
-  return httpPost<SubmitResponse>("/api/contact", payload);
+  const raw = await httpPost<JsonApiSingleResponse<ContactAttributes>>(
+    "/api/contact",
+    payload
+  );
+
+  return { data: deserializeContact(raw.data) };
 }
 
-export function fetchMessages(): Promise<MessagesResponse> {
-  return httpGet<MessagesResponse>("/api/admin/messages");
+export async function fetchMessages(): Promise<MessagesResponse> {
+  const raw = await httpGet<JsonApiListResponse<ContactAttributes>>(
+    "/api/admin/messages"
+  );
+
+  return { data: raw.data.map((r) => deserializeContact(r)) };
 }

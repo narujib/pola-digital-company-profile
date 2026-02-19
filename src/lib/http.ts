@@ -1,10 +1,5 @@
 const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || "";
 
-interface HttpError {
-  code: string;
-  message: string;
-}
-
 export class ApiError extends Error {
   code: string;
   status: number;
@@ -41,11 +36,12 @@ async function request<T>(
 
   const json = await res.json();
 
-  if (!json.success) {
-    const error = json.error as HttpError;
+  // JSON:API error format: { errors: [{ status, code, detail }] }
+  if (json.errors) {
+    const err = json.errors[0];
     throw new ApiError(
-      error.code || "UNKNOWN_ERROR",
-      error.message || "Terjadi kesalahan",
+      err.code || "UNKNOWN_ERROR",
+      err.detail || "Terjadi kesalahan",
       res.status
     );
   }
