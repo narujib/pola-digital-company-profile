@@ -25,11 +25,14 @@ export function AdminSearchInput({
   }, [value]);
 
   useEffect(() => {
+    // Only fire onChange when localValue actually differs from the prop
+    if (localValue === value) return;
+
     const timer = setTimeout(() => {
       onChange(localValue);
     }, debounce);
     return () => clearTimeout(timer);
-  }, [localValue, onChange, debounce]);
+  }, [localValue, onChange, debounce, value]);
 
   return (
     <div className="relative w-full sm:w-[300px]">

@@ -8,6 +8,7 @@ import {
   FileText,
   MessageSquare,
   LogOut,
+  Tags,
 } from "lucide-react";
 import { Logo } from "@/components/logo";
 import {
@@ -35,6 +36,11 @@ const navItems = [
     title: "Blog Posts",
     url: "/admin/blogs",
     icon: FileText,
+  },
+  {
+    title: "Categories",
+    url: "/admin/categories",
+    icon: Tags,
   },
   {
     title: "Messages",

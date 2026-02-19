@@ -6,7 +6,12 @@ import type { Prisma } from "@/generated/prisma/client";
 // ==========================================
 
 export async function createBlog(data: Prisma.BlogCreateInput) {
-  return prisma.blog.create({ data });
+  return prisma.blog.create({
+    data,
+    include: {
+      categories: true,
+    },
+  });
 }
 
 // ==========================================
@@ -17,6 +22,9 @@ export async function updateBlog(id: string, data: Prisma.BlogUpdateInput) {
   return prisma.blog.update({
     where: { id },
     data,
+    include: {
+      categories: true,
+    },
   });
 }
 
@@ -54,6 +62,11 @@ export async function findBySlug(slug: string, includeAuthor: boolean = false) {
 export async function findById(id: string) {
   return prisma.blog.findUnique({
     where: { id },
+    include: {
+      categories: {
+        select: { id: true, name: true, slug: true },
+      },
+    },
   });
 }
 
@@ -76,13 +89,16 @@ export async function findAll(options: FindAllOptions) {
     where,
     skip,
     take,
-    include: includeAuthor
-      ? {
-          author: {
-            select: { id: true, name: true, email: true, createdAt: true },
-          },
-        }
-      : undefined,
+    include: {
+      categories: {
+        select: { id: true, name: true, slug: true },
+      },
+      ...(includeAuthor && {
+        author: {
+          select: { id: true, name: true, email: true, createdAt: true },
+        },
+      }),
+    },
     orderBy: orderBy ?? { createdAt: "desc" },
   });
 }

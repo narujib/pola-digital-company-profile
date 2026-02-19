@@ -24,6 +24,7 @@ export const createBlogSchema = z.object({
     .boolean()
     .optional()
     .default(false),
+  categoryIds: z.array(z.string().uuid()).optional(),
 });
 
 export const updateBlogSchema = z.object({
@@ -53,6 +54,7 @@ export const updateBlogSchema = z.object({
   isPublished: z
     .boolean()
     .optional(),
+  categoryIds: z.array(z.string().uuid()).optional(),
 });
 
 // JSON:API query parameter schema

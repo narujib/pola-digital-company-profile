@@ -38,6 +38,11 @@ export async function createBlog(input: CreateBlogInput, authorId: string) {
     thumbnail: input.thumbnail,
     isPublished: input.isPublished,
     author: { connect: { id: authorId } },
+    categories: input.categoryIds
+      ? {
+          connect: input.categoryIds.map((id) => ({ id })),
+        }
+      : undefined,
   });
 }
 
@@ -53,7 +58,8 @@ export async function updateBlog(id: string, input: UpdateBlogInput) {
   }
 
   // Jika slug diberikan dari client, gunakan itu; jika title berubah, generate slug baru
-  const data: Prisma.BlogUpdateInput = { ...input };
+  const { categoryIds, ...restInput } = input;
+  const data: Prisma.BlogUpdateInput = { ...restInput };
 
   if (input.slug?.trim()) {
     const newSlug = input.slug.trim();
@@ -69,6 +75,12 @@ export async function updateBlog(id: string, input: UpdateBlogInput) {
       throw new BlogError("SLUG_EXISTS", "Blog dengan slug serupa sudah ada");
     }
     data.slug = newSlug;
+  }
+
+  if (categoryIds) {
+    data.categories = {
+      set: categoryIds.map((id) => ({ id })),
+    };
   }
 
   return blogRepo.updateBlog(id, data);

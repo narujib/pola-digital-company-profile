@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { jsonApiError } from "@/utils/response";
 import { AuthError } from "@/modules/auth/auth.service";
 import { BlogError } from "@/modules/blog/blog.service";
+import { CategoryError } from "@/modules/category/category.service";
 
 // ==========================================
 // Base Application Error
@@ -23,7 +24,7 @@ export class AppError extends Error {
 // Error Status Mapping
 // ==========================================
 
-function getErrorStatus(error: AuthError | BlogError | AppError): number {
+function getErrorStatus(error: AuthError | BlogError | CategoryError | AppError): number {
   // AppError sudah punya statusCode
   if (error instanceof AppError) {
     return error.statusCode;
@@ -41,6 +42,16 @@ function getErrorStatus(error: AuthError | BlogError | AppError): number {
         return 404;
       default:
         return 400;
+    }
+  }
+
+  // CategoryError depending on code
+  if (error instanceof CategoryError) {
+    switch (error.code) {
+      case "NOT_FOUND":
+        return 404;
+      default:
+        return 400; // SLUG_EXISTS, NAME_EXISTS, etc.
     }
   }
 
@@ -76,6 +87,7 @@ export function withErrorHandler(fn: ControllerFn): ControllerFn {
       if (
         error instanceof AuthError ||
         error instanceof BlogError ||
+        error instanceof CategoryError ||
         error instanceof AppError
       ) {
         return jsonApiError({
@@ -96,10 +108,14 @@ export function withErrorHandler(fn: ControllerFn): ControllerFn {
       }
 
       // Unknown errors
-      console.error("Unhandled error:", error);
+      console.error("[Unhandled Error]", error); // Log full error object
+      if (error instanceof Error) {
+        console.error("Stack:", error.stack);
+      }
+      
       return jsonApiError({
         code: "INTERNAL_ERROR",
-        detail: "Terjadi kesalahan internal",
+        detail: error instanceof Error ? error.message : "Terjadi kesalahan internal", // Return actual error message in dev
         status: 500,
       });
     }

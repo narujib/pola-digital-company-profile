@@ -20,6 +20,7 @@ interface BlogRecord {
   createdAt: Date;
   updatedAt: Date;
   author?: { id: string; name: string; email: string };
+  categories?: { id: string; name: string; slug: string }[];
 }
 
 function serializeBlogAttributes(blog: BlogRecord) {
@@ -41,6 +42,9 @@ function serializeBlogRelationships(blog: BlogRecord) {
     author: {
       data: { type: "users", id: blog.authorId },
     },
+    categories: {
+      data: blog.categories?.map((c) => ({ type: "categories", id: c.id })) || [],
+    },
   };
 }
 
@@ -58,6 +62,20 @@ function serializeAuthorIncluded(blog: BlogRecord) {
   ];
 }
 
+function serializeCategoryIncluded(blog: BlogRecord) {
+  if (!blog.categories) return [];
+  return blog.categories.map((c) => ({
+    type: "categories",
+    id: c.id,
+    attributes: {
+      name: c.name,
+      slug: c.slug,
+    },
+  }));
+}
+
+
+
 // ==========================================
 // Get Blog by ID (Admin)
 // ==========================================
@@ -73,6 +91,7 @@ export async function getBlogByIdController(
       id: blog.id,
       attributes: serializeBlogAttributes(blog),
       relationships: serializeBlogRelationships(blog),
+      included: [...serializeAuthorIncluded(blog), ...serializeCategoryIncluded(blog)],
     });
   })(req);
 }
@@ -105,7 +124,7 @@ export const getAllBlogsController = withErrorHandler(async (req: NextRequest) =
     }
   }
 
-  const included = Array.from(includedMap.values()).map((author) => ({
+  const includedAuthors = Array.from(includedMap.values()).map((author) => ({
     type: "users",
     id: author!.id,
     attributes: {
@@ -114,6 +133,29 @@ export const getAllBlogsController = withErrorHandler(async (req: NextRequest) =
     },
   }));
 
+  // Collect unique included categories
+  const includedCategoriesMap = new Map<string, { id: string; name: string; slug: string }>();
+  for (const blog of blogRecords) {
+    if (blog.categories) {
+      for (const cat of blog.categories) {
+        if (!includedCategoriesMap.has(cat.id)) {
+          includedCategoriesMap.set(cat.id, cat);
+        }
+      }
+    }
+  }
+
+  const includedCategories = Array.from(includedCategoriesMap.values()).map((cat) => ({
+    type: "categories",
+    id: cat.id,
+    attributes: {
+      name: cat.name,
+      slug: cat.slug,
+    },
+  }));
+
+  const allIncluded = [...includedAuthors, ...includedCategories];
+
   return jsonApiList({
     type: "blogs",
     items: blogRecords.map((blog) => ({
@@ -121,7 +163,7 @@ export const getAllBlogsController = withErrorHandler(async (req: NextRequest) =
       attributes: serializeBlogAttributes(blog),
       relationships: serializeBlogRelationships(blog),
     })),
-    ...(included.length > 0 && { included }),
+    ...(allIncluded.length > 0 && { included: allIncluded }),
     meta,
   });
 });
@@ -143,7 +185,7 @@ export async function getBlogBySlugController(
       id: blog.id,
       attributes: serializeBlogAttributes(blog),
       relationships: serializeBlogRelationships(blog),
-      included: serializeAuthorIncluded(blog),
+      included: [...serializeAuthorIncluded(blog), ...serializeCategoryIncluded(blog)],
     });
   })(req);
 }
@@ -175,6 +217,7 @@ export async function createBlogController(
       id: blog.id,
       attributes: serializeBlogAttributes(blog),
       relationships: serializeBlogRelationships(blog),
+      included: [...serializeAuthorIncluded(blog), ...serializeCategoryIncluded(blog)],
       status: 201,
     });
   })(req);
@@ -207,6 +250,7 @@ export async function updateBlogController(
       id: blog.id,
       attributes: serializeBlogAttributes(blog),
       relationships: serializeBlogRelationships(blog),
+      included: [...serializeAuthorIncluded(blog), ...serializeCategoryIncluded(blog)],
     });
   })(req);
 }

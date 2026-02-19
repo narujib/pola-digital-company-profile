@@ -20,6 +20,11 @@ interface Blog {
     name: string;
     email: string;
   };
+  categories?: {
+    id: string;
+    name: string;
+    slug: string;
+  }[];
 }
 
 // JSON:API response shapes
@@ -29,7 +34,7 @@ interface JsonApiResource<A = Record<string, unknown>> {
   attributes: A;
   relationships?: Record<
     string,
-    { data: { type: string; id: string } }
+    { data: { type: string; id: string } | { type: string; id: string }[] }
   >;
 }
 
@@ -77,7 +82,7 @@ interface FetchBlogsParams {
 // Deserialization
 // ==========================================
 
-type BlogAttributes = Omit<Blog, "id" | "author">;
+type BlogAttributes = Omit<Blog, "id" | "author" | "categories">;
 
 function deserializeBlog(
   resource: JsonApiResource<BlogAttributes>,
@@ -91,14 +96,37 @@ function deserializeBlog(
   // Resolve author from included
   if (included && resource.relationships?.author) {
     const authorRef = resource.relationships.author.data;
-    const authorResource = included.find(
-      (r) => r.type === authorRef.type && r.id === authorRef.id
-    );
-    if (authorResource) {
-      blog.author = {
-        id: authorResource.id,
-        ...(authorResource.attributes as { name: string; email: string }),
-      };
+    if (!Array.isArray(authorRef)) {
+      const authorResource = included.find(
+        (r) => r.type === authorRef.type && r.id === authorRef.id
+      );
+      if (authorResource) {
+        blog.author = {
+          id: authorResource.id,
+          ...(authorResource.attributes as { name: string; email: string }),
+        };
+      }
+    }
+  }
+
+  // Resolve categories from included
+  if (included && resource.relationships?.categories) {
+    const categoryRefs = resource.relationships.categories.data;
+    if (Array.isArray(categoryRefs)) {
+      blog.categories = categoryRefs
+        .map((ref) => {
+          const catResource = included.find(
+            (r) => r.type === ref.type && r.id === ref.id
+          );
+          if (catResource) {
+            return {
+              id: catResource.id,
+              ...(catResource.attributes as { name: string; slug: string }),
+            };
+          }
+          return null;
+        })
+        .filter((c): c is NonNullable<typeof c> => c !== null);
     }
   }
 

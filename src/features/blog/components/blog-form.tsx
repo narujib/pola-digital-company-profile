@@ -21,6 +21,8 @@ import { RichTextEditor } from "@/components/rich-text-editor";
 import type { Blog, CreateBlogPayload } from "@/features/blog/blog.hooks";
 import { createBlogSchema } from "@/modules/blog/blog.validation";
 import { cn } from "@/lib/utils";
+import { MultiSelect } from "@/components/ui/multi-select";
+import { useCategories } from "@/features/category/hooks";
 
 interface BlogFormProps {
   initialData?: Blog;
@@ -49,8 +51,17 @@ export function BlogForm({
   const [excerpt, setExcerpt] = useState(initialData?.excerpt || "");
   const [thumbnail, setThumbnail] = useState(initialData?.thumbnail || "");
   const [isPublished, setIsPublished] = useState(initialData?.isPublished || false);
+  const [categoryIds, setCategoryIds] = useState<string[]>(
+    initialData?.categories?.map((c) => c.id) || []
+  );
   const [saved, setSaved] = useState(false);
   const [validationErrors, setValidationErrors] = useState<Record<string, string>>({});
+
+  const { data: categoriesData } = useCategories({ limit: 100 });
+  const categoryOptions = categoriesData?.data.map((c: { name: string; id: string }) => ({
+    label: c.name,
+    value: c.id,
+  })) || [];
 
   // Slug is either manually entered or auto-derived from title
   const slug = customSlug ?? generateSlug(title);
@@ -67,13 +78,14 @@ export function BlogForm({
         content !== initialData.content ||
         excerpt !== initialData.excerpt ||
         thumbnail !== (initialData.thumbnail || "") ||
-        isPublished !== initialData.isPublished
+        isPublished !== initialData.isPublished ||
+        JSON.stringify(categoryIds.sort()) !== JSON.stringify(initialData.categories?.map((c: { id: string }) => c.id).sort() || [])
       );
     } else {
       // Create mode: check if any field is filled
-      return !!title || !!content || !!excerpt || !!thumbnail;
+      return !!title || !!content || !!excerpt || !!thumbnail || categoryIds.length > 0;
     }
-  }, [saved, title, slug, content, excerpt, thumbnail, isPublished, initialData]);
+  }, [saved, title, slug, content, excerpt, thumbnail, isPublished, categoryIds, initialData]);
 
   useUnsavedChanges(hasChanges);
 
@@ -88,6 +100,7 @@ export function BlogForm({
       excerpt,
       thumbnail: thumbnail || undefined,
       isPublished,
+      categoryIds,
     };
 
     // Validate using Zod schema
@@ -163,6 +176,16 @@ export function BlogForm({
               </div>
               {validationErrors.slug && <FieldError>{validationErrors.slug}</FieldError>}
 
+            </Field>
+
+            <Field>
+              <FieldLabel>Kategori</FieldLabel>
+              <MultiSelect
+                options={categoryOptions}
+                value={categoryIds}
+                onChange={setCategoryIds}
+                placeholder="Pilih kategori..."
+              />
             </Field>
 
             <Field>

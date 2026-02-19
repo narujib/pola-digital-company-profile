@@ -28,6 +28,11 @@ export interface Blog {
     name: string;
     email: string;
   };
+  categories?: {
+    id: string;
+    name: string;
+    slug: string;
+  }[];
 }
 
 interface UseBlogsResult {
@@ -113,6 +118,7 @@ export interface CreateBlogPayload {
   excerpt: string;
   thumbnail?: string;
   isPublished: boolean;
+  categoryIds?: string[];
 }
 
 interface UseCreateBlogResult {

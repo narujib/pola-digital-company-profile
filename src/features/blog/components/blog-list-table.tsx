@@ -36,7 +36,7 @@ export function BlogListTable({ blogs, loading, onDelete }: BlogListTableProps) 
         <TableHeader>
           <TableRow>
             <TableHead>Judul</TableHead>
-            <TableHead>Penulis</TableHead>
+            <TableHead>Kategori</TableHead>
             <TableHead>Tanggal</TableHead>
             <TableHead>Status</TableHead>
             <TableHead className="w-[100px] text-right">Aksi</TableHead>
@@ -60,7 +60,19 @@ export function BlogListTable({ blogs, loading, onDelete }: BlogListTableProps) 
                     </span>
                   </div>
                 </TableCell>
-                <TableCell>{blog.author?.name || "-"}</TableCell>
+                <TableCell>
+                  {blog.categories && blog.categories.length > 0 ? (
+                    <div className="flex flex-wrap gap-1">
+                      {blog.categories.map((cat) => (
+                        <Badge key={cat.id} variant="outline" className="text-xs">
+                          {cat.name}
+                        </Badge>
+                      ))}
+                    </div>
+                  ) : (
+                    <Badge variant="secondary" className="text-xs">Uncategorized</Badge>
+                  )}
+                </TableCell>
                 <TableCell>
                   {formatDate(blog.createdAt)}
                 </TableCell>
