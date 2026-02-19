@@ -54,9 +54,8 @@ export function MultiSelect({
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
         <div
-          role="combobox"
-          aria-expanded={open}
-          aria-controls="multi-select-options"
+          aria-label={placeholder}
+          tabIndex={0}
           className={cn(
             "flex items-center justify-between rounded-md border border-input bg-transparent px-3 py-2 text-sm shadow-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-ring disabled:cursor-not-allowed disabled:opacity-50",
             "w-full h-auto min-h-10 cursor-pointer",
@@ -78,6 +77,7 @@ export function MultiSelect({
                   {option.label}
                   <button
                     className="ml-1 ring-offset-background rounded-full outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
+                    aria-label={`Remove ${option.label}`}
                     onKeyDown={(e) => {
                       if (e.key === "Enter") {
                         handleUnselect(option);
