@@ -20,5 +20,5 @@ export const aboutContent = {
     },
   ],
   ctaText: "Mari Mulai Berkonsultasi",
-  ctaLink: "/about",
+  ctaLink: "/contact",
 };
