@@ -63,7 +63,9 @@ export const querySchema = z.object({
   page: z.coerce.number().int().positive().optional().default(1),
   limit: z.coerce.number().int().positive().max(100).optional().default(10),
   search: z.string().optional(),
+  category: z.string().optional(),
   published: z.enum(["true", "false"]).optional(),
+
   include: z.string().optional(),
   sort: z.string().optional(),
 });
@@ -90,7 +92,10 @@ export function parseJsonApiQuery(searchParams: URLSearchParams): Record<string,
       result.published = value;
     } else if (key === "filter[search]") {
       result.search = value;
+    } else if (key === "filter[category]") {
+      result.category = value;
     } else if (key === "page[number]") {
+
       result.page = value;
     } else if (key === "page[size]") {
       result.limit = value;

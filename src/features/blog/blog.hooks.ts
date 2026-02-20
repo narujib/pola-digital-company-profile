@@ -1,13 +1,17 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
-import { fetchBlogs, fetchBlogById, deleteBlog, createBlog, updateBlog } from "@/features/blog/blog.api";
+import { fetchBlogs, fetchBlogById, deleteBlog, createBlog, updateBlog, fetchCategories, fetchBlogBySlug } from "@/features/blog/blog.api";
+
+
 
 interface UseBlogsParams {
   page?: number;
   limit?: number;
   search?: string;
+  category?: string;
   published?: boolean;
+
   include?: string;
   sort?: string;
 }
@@ -149,8 +153,45 @@ export function useCreateBlog(): UseCreateBlogResult {
 }
 
 // ==========================================
+// useBlogBySlug
+// ==========================================
+
+interface UseBlogBySlugResult {
+  blog: Blog | null;
+  loading: boolean;
+  error: string | null;
+}
+
+export function useBlogBySlug(slug: string, include?: string): UseBlogBySlugResult {
+  const [blog, setBlog] = useState<Blog | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    async function load() {
+      if (!slug) return;
+      
+      setLoading(true);
+      setError(null);
+      try {
+        const result = await fetchBlogBySlug(slug, include);
+        setBlog(result.data);
+      } catch (err) {
+        setError(err instanceof Error ? err.message : "Gagal memuat blog");
+      } finally {
+        setLoading(false);
+      }
+    }
+    load();
+  }, [slug, include]);
+
+  return { blog, loading, error };
+}
+
+// ==========================================
 // useBlogById
 // ==========================================
+
 
 interface UseBlogByIdResult {
   blog: Blog | null;
@@ -211,4 +252,44 @@ export function useUpdateBlog(): UseUpdateBlogResult {
   }, []);
 
   return { update, loading, error };
+}
+// ==========================================
+// Categories
+// ==========================================
+
+export interface Category {
+  id: string;
+  name: string;
+  slug: string;
+  blogCount: number;
+}
+
+interface UseCategoriesResult {
+  categories: Category[];
+  loading: boolean;
+  error: string | null;
+}
+
+export function useCategories(): UseCategoriesResult {
+  const [categories, setCategories] = useState<Category[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    async function load() {
+      setLoading(true);
+      setError(null);
+      try {
+        const result = await fetchCategories();
+        setCategories(result.data);
+      } catch (err) {
+        setError(err instanceof Error ? err.message : "Gagal memuat kategori");
+      } finally {
+        setLoading(false);
+      }
+    }
+    load();
+  }, []);
+
+  return { categories, loading, error };
 }

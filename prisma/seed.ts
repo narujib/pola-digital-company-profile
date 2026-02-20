@@ -39,36 +39,11 @@ async function main() {
   }
 
   // ==========================================
-  // Blog Seeder
+  // Cleanup Existing Data
   // ==========================================
-
-  const existingBlogs = await prisma.blog.count();
-
-  if (existingBlogs > 0) {
-    console.log(`✅ ${existingBlogs} blog sudah ada, skip seeding blog.`);
-    return;
-  }
-
-  const topics = [
-    { category: "Web Development", subjects: ["Next.js", "React", "Vue.js", "Angular", "Svelte", "Astro", "Remix", "Nuxt.js"] },
-    { category: "Mobile Development", subjects: ["Flutter", "React Native", "Swift", "Kotlin", "Ionic", "Capacitor"] },
-    { category: "DevOps", subjects: ["Docker", "Kubernetes", "CI/CD", "GitHub Actions", "Terraform", "Ansible"] },
-    { category: "Design", subjects: ["Figma", "UI/UX", "Design System", "Tailwind CSS", "CSS Grid", "Animasi Web"] },
-    { category: "Data", subjects: ["PostgreSQL", "MongoDB", "Redis", "Prisma ORM", "GraphQL", "REST API"] },
-    { category: "Security", subjects: ["JWT Authentication", "OAuth 2.0", "CORS", "HTTPS", "Input Validation"] },
-    { category: "Cloud", subjects: ["AWS", "Google Cloud", "Vercel", "Supabase", "Firebase", "Cloudflare"] },
-    { category: "AI & ML", subjects: ["Machine Learning", "ChatGPT API", "TensorFlow.js", "LangChain", "AI Agents"] },
-  ];
-
-  const templates = [
-    { prefix: "Panduan Lengkap", excerpt: "Panduan komprehensif untuk memahami dan menggunakan" },
-    { prefix: "Memulai dengan", excerpt: "Langkah awal untuk memulai menggunakan" },
-    { prefix: "Best Practices", excerpt: "Kumpulan best practices dalam penggunaan" },
-    { prefix: "Tips & Trik", excerpt: "Tips dan trik praktis untuk mengoptimalkan penggunaan" },
-    { prefix: "Studi Kasus:", excerpt: "Studi kasus nyata dalam implementasi" },
-    { prefix: "Perbandingan", excerpt: "Analisis mendalam membandingkan" },
-    { prefix: "Optimasi Performa", excerpt: "Cara mengoptimalkan performa dengan" },
-  ];
+  console.log("🧹 Membersihkan data blog dan kategori lama...");
+  await prisma.blog.deleteMany({});
+  await prisma.category.deleteMany({});
 
   function slugify(text: string): string {
     return text
@@ -79,50 +54,97 @@ async function main() {
       .trim();
   }
 
-  const blogs: {
-    title: string;
-    slug: string;
-    content: string;
-    excerpt: string;
-    isPublished: boolean;
-    createdAt: Date;
-  }[] = [];
+  // ==========================================
 
-  for (let i = 0; i < 50; i++) {
-    const topic = topics[i % topics.length];
-    const subject = topic.subjects[i % topic.subjects.length];
-    const template = templates[i % templates.length];
+  // Category Seeder
+  // ==========================================
 
-    const title = `${template.prefix} ${subject} di ${topic.category}`;
-    const slug = slugify(title) + `-${i + 1}`;
-    const isPublished = i % 10 < 7; // 70% published, 30% draft
+  const categoryNames = ["Technology", "Business", "Lifestyle", "Design", "Marketing"];
+  const categories = [];
 
-    // Stagger creation dates over the last 6 months
-    const daysAgo = Math.floor((50 - i) * 3.6);
-    const createdAt = new Date(Date.now() - daysAgo * 24 * 60 * 60 * 1000);
-
-    blogs.push({
-      title,
-      slug,
-      content: `${subject} adalah teknologi penting dalam ${topic.category}.\n\n## Pendahuluan\n\nDalam artikel ini kita akan membahas tentang ${subject} secara mendalam, termasuk cara penggunaan, best practices, dan tips praktis.\n\n## Mengapa ${subject}?\n\n1. **Populer** — Banyak digunakan oleh developer di seluruh dunia\n2. **Powerful** — Fitur lengkap untuk kebutuhan ${topic.category.toLowerCase()}\n3. **Community** — Komunitas aktif dan dokumentasi yang baik\n4. **Scalable** — Cocok untuk proyek kecil hingga enterprise\n\n## Kesimpulan\n\n${subject} adalah pilihan yang solid untuk ${topic.category.toLowerCase()}. Dengan memahami konsep dasar dan best practices, Anda bisa memaksimalkan potensi teknologi ini dalam proyek Anda.`,
-      excerpt: `${template.excerpt} ${subject} dalam ${topic.category.toLowerCase()}. Cocok untuk pemula maupun developer berpengalaman.`,
-      isPublished,
-      createdAt,
+  for (const name of categoryNames) {
+    const slug = slugify(name);
+    const category = await prisma.category.upsert({
+      where: { slug },
+      update: {},
+      create: {
+        name,
+        slug,
+      },
     });
+    categories.push(category);
+    console.log(`✅ Kategori ${name} siap.`);
   }
 
-  for (const blog of blogs) {
+  // ==========================================
+  // Blog Seeder
+  // ==========================================
+
+  const subjects = [
+    "Next.js", "React", "Tailwind CSS", "Prisma ORM", "TypeScript", 
+    "Digital Marketing", "UI/UX Design", "Business Strategy", "Content Creation", "SEO Basics"
+  ];
+
+  const templates = [
+    { prefix: "Panduan Lengkap", excerpt: "Panduan komprehensif untuk memahami" },
+    { prefix: "Tips & Trik Menguasai", excerpt: "Beberapa tips praktis untuk" },
+    { prefix: "Pentingnya", excerpt: "Mengapa kita harus peduli dengan" },
+    { prefix: "Masa Depan", excerpt: "Bagaimana tren mendatang terkait" },
+    { prefix: "Mengenal Lebih Dekat", excerpt: "Analisis mendalam mengenai" },
+  ];
+
+  console.log("🚀 Membuat 50 blog baru...");
+
+  for (let i = 0; i < 50; i++) {
+    const subject = subjects[i % subjects.length];
+    // Use Math.floor to get 50 unique combinations before repeating
+    const templateIndex = Math.floor(i / subjects.length) % templates.length;
+    const template = templates[templateIndex];
+    
+    // Pilih 1-3 kategori secara acak
+    const numCategories = Math.floor(Math.random() * 3) + 1;
+    const shuffledCategories = [...categories].sort(() => 0.5 - Math.random());
+    const selectedCategories = shuffledCategories.slice(0, numCategories);
+
+    // Tambahkan nomor seri agar 100% dipastikan tidak ada judul yang sama
+    const title = `${template.prefix} ${subject} di Tahun 2026 #${i + 1}`;
+    const uniqueSuffix = Math.random().toString(36).substring(2, 7);
+    const slug = `${slugify(title)}-${uniqueSuffix}`;
+    
+    const isPublished = Math.random() > 0.2; // 80% published
+    
+    // Rentang waktu: 1 bulan lalu (30 hari) sampai kemaren (1 hari)
+    const minDays = 1;
+    const maxDays = 30;
+    const daysAgo = Math.floor(Math.random() * (maxDays - minDays + 1)) + minDays;
+    
+    const createdAt = new Date(Date.now() - daysAgo * 24 * 60 * 60 * 1000);
+    // updatedAt secara acak setelah atau sama dengan createdAt, tapi maksimal kemaren
+    const updatedDaysAgo = Math.floor(Math.random() * daysAgo) + 1;
+    const updatedAt = new Date(Date.now() - updatedDaysAgo * 24 * 60 * 60 * 1000);
+
     await prisma.blog.create({
       data: {
-        ...blog,
+        title,
+        slug,
+        content: `Ini adalah konten untuk artikel mengenai ${subject}. Dalam era digital saat ini, ${subject} memegang peranan penting. Artikel ini mencakup topik ${selectedCategories.map(c => c.name).join(", ")}.\n\n## Poin Utama\n1. Efisiensi kerja meningkat\n2. Kualitas output lebih terjamin\n3. Relevansi industri jangka panjang`,
+        excerpt: `${template.excerpt} ${subject} dalam konteks industri saat ini.`,
+        thumbnail: null,
+        isPublished,
         authorId: admin.id,
+        createdAt,
+        updatedAt,
+        categories: {
+          connect: selectedCategories.map(c => ({ id: c.id }))
+        }
       },
     });
   }
 
-  const published = blogs.filter((b) => b.isPublished).length;
-  const draft = blogs.length - published;
-  console.log(`✅ ${blogs.length} blog berhasil dibuat (${published} published, ${draft} draft).`);
+  console.log(`✅ Berhasil menambahkan 50 blog baru dengan relasi multi-kategori.`);
+
+
+
 }
 
 main()

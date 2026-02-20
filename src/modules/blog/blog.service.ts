@@ -147,6 +147,15 @@ export async function getAllBlogs(query: QueryInput) {
     };
   }
 
+  if (query.category) {
+    where.categories = {
+      some: {
+        slug: query.category,
+      },
+    };
+  }
+
+
   // Handle sorting
   let orderBy: Prisma.BlogOrderByWithRelationInput = { createdAt: "desc" };
   if (sort) {

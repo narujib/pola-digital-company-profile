@@ -40,6 +40,7 @@ export function BlogCardDetailed({ post, delayIndex = 0 }: BlogCardProps) {
           <Tag className="size-4 text-[var(--pub-accent)]" />
           <span className="font-medium whitespace-nowrap">{post.category}</span>
         </div>
+
         <div className="flex items-center gap-2 text-[var(--pub-body)]">
           <Calendar className="size-4 text-[var(--pub-accent)]" />
           <span className="font-medium whitespace-nowrap">{post.date}</span>

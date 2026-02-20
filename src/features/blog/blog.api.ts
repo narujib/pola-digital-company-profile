@@ -73,10 +73,12 @@ interface FetchBlogsParams {
   page?: number;
   limit?: number;
   search?: string;
+  category?: string; // added category slug filter
   published?: boolean;
   include?: string;
   sort?: string;
 }
+
 
 // ==========================================
 // Deserialization
@@ -144,7 +146,9 @@ export async function fetchBlogs(
   if (params?.page) searchParams.set("page[number]", String(params.page));
   if (params?.limit) searchParams.set("page[size]", String(params.limit));
   if (params?.search) searchParams.set("filter[search]", params.search);
+  if (params?.category) searchParams.set("filter[category]", params.category);
   if (params?.published !== undefined)
+
     searchParams.set("filter[published]", String(params.published));
   if (params?.include) searchParams.set("include", params.include);
   if (params?.sort) searchParams.set("sort", params.sort);
@@ -206,3 +210,25 @@ export async function updateBlog(
 export async function deleteBlog(id: string): Promise<{ meta: { message: string } }> {
   return httpDelete<JsonApiMetaResponse>(`/api/admin/blogs/${id}`) as Promise<{ meta: { message: string } }>;
 }
+
+// ==========================================
+// Category API
+// ==========================================
+
+export interface CategoryResponse {
+  id: string;
+  name: string;
+  slug: string;
+  blogCount: number;
+}
+
+export async function fetchCategories(): Promise<{ data: CategoryResponse[] }> {
+  const raw = await httpGet<JsonApiListResponse<Omit<CategoryResponse, "id">>>("/api/categories");
+  return {
+    data: raw.data.map((r) => ({
+      id: r.id,
+      ...r.attributes,
+    })),
+  };
+}
+
